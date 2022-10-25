@@ -1,20 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SquareUp.View;
-using SquareUp.Services.Navigation;
+﻿using SquareUp.View;
+using SquareUp.Resources.Themes;
 
 namespace SquareUp;
 
 public class App : Application
 {
-    private readonly INavigationService _navigationService;
+    
 
-    public App(LoginPage mainPage, INavigationService navigationService)
+    public App(LoginPage loginPage)
     {
-        _navigationService = navigationService;
-        MainPage = new AppShell(mainPage, navigationService);
+        SetAppTheme(RequestedTheme);
+
+        RequestedThemeChanged += HandleRequestedThemeChanged;
+
+        MainPage = new AppShell { Items = { loginPage } };
     }
+
+    private void HandleRequestedThemeChanged(object sender, AppThemeChangedEventArgs e) =>
+        SetAppTheme(e.RequestedTheme);
+
+
+    private void SetAppTheme(in AppTheme appTheme) => Resources = appTheme switch
+    {
+        AppTheme.Dark => new DarkTheme(),
+        _ => new DarkTheme()
+    };
 }

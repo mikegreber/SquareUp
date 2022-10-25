@@ -1,7 +1,6 @@
 ﻿using System.Net.Http.Json;
 using SquareUp.Model;
-using SquareUp.Shared;
-using SquareUp.Shared.Models;
+using SquareUp.Services.Transactions;
 using SquareUp.Shared.Requests;
 using SquareUp.Shared.Types;
 using static SquareUp.Shared.Endpoints.Users;
@@ -11,44 +10,64 @@ public class UserService : IUserService
 {
     private readonly HttpClient _http;
 
-    private UserClient? _user;
+    private ObservableUserBase? _user;
 
     public UserService(HttpClient http)
     {
         _http = http;
     }
 
-    public UserClient? GetCurrentUser() => _user;
+    public ObservableUserBase? GetCurrentUser() => _user;
 
-    public async Task<ServiceResponse<UserClient>> Login(LoginRequest request)
+    public async Task<ServiceResponse<ObservableUserBase>> Login(LoginRequest request)
     {
-        try
-        {
-            var result = await _http.PostAsJsonAsync(PostLoginUri, request);
-            var response = await result.Content.ReadFromJsonAsync<ServiceResponse<UserClient>>() ??
-                           new(message: "Request failed.");
-            if (response.Success) _user = response.Data;
-            return response;
-        }
-        catch (Exception e)
-        {
-            return new(message: $"Request failed. {e.Message}");
-        }
+        var response =  await _http
+            .PostAsJsonAsync(PostLoginUri, request, true)
+            .ServiceResponse<ObservableUserBase>();
+
+        if (response.Success) _user = response.Data;
         
+        return response;
+
+        //return await _http.PostServiceCallAsJsonAsync<ObservableUserBase>(PostLoginUri, request);
+        //return await ServiceCall<ObservableUserBase>(async () => await _http.PostAsJsonAsync(PostLoginUri, request));
+
+        // try
+        // {
+        //     
+        //
+        //     var r = await _http
+        //         .PostAsJsonAsync(PostLoginUri, request);
+        //     if (r.IsSuccessStatusCode)
+        //     {
+        //         var response = await r.ServiceResponse<ObservableUserBase>();
+        //
+        //         if (response.Success) _user = response.Data;
+        //
+        //         return response;
+        //     }
+        //     
+        // }
+        // catch (Exception)
+        // {
+        //     
+        // }
+        //
+        // return new ServiceResponse<ObservableUserBase>(message: "Error");
+        // if (response.Success) _user = response.Data;
+        //
+        // return response;
     }
 
-    public async Task<ServiceResponse<UserClient>> Register(RegisterRequest request)
+    public async Task<ServiceResponse<ObservableUserBase>> Register(RegisterRequest request)
     {
-        try
-        {
-            var result = await _http.PostAsJsonAsync(PostRegisterUri, request);
-            var response = await result.Content.ReadFromJsonAsync<ServiceResponse<UserClient>>() ?? new(message: "Request failed.");
-            if (response.Success) _user = response.Data;
-            return response;
-        }
-        catch (Exception e)
-        {
-            return new(message: $"Request failed. {e.Message}");
-        }
+
+        var response = await _http
+            .PostAsJsonAsync(PostRegisterUri, request)
+            .ServiceResponse<ObservableUserBase>();
+
+        if (response.Success) _user = response.Data;
+
+        return response;
     }
 }

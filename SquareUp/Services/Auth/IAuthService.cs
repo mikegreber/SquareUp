@@ -6,7 +6,7 @@ namespace SquareUp.Services.Auth
 {
     public interface IAuthService
     {
-        Task<ServiceResponse<UserClient>> Login(LoginRequest loginRequest);
-        Task<ServiceResponse<UserClient>> Register(RegisterRequest registerRequest);
+        Task<ServiceResponse<ObservableUserBase>> Login(LoginRequest loginRequest);
+        Task<ServiceResponse<ObservableUserBase>> Register(RegisterRequest registerRequest);
     }
 }

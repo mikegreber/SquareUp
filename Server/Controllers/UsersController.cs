@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SquareUp.Server.Models;
 using SquareUp.Server.Services.Users;
-using SquareUp.Shared;
+using SquareUp.Shared.Models;
 using SquareUp.Shared.Requests;
 using SquareUp.Shared.Types;
 using static SquareUp.Shared.ControllerEndpoints.Users;
@@ -19,29 +19,29 @@ namespace SquareUp.Server.Controllers
             _userService = userService;
         }
 
-        [HttpGet(GetAll)]
-        public async Task<ActionResult<ServiceResponse<List<UserClient>>>> GetUsers()
+        [HttpGet(GetAllUri)]
+        public async Task<ActionResult<ServiceResponse<List<User>>>> GetUsers()
         {
             var result = await _userService.GetUsers();
             return Ok(result);
         }
 
-        [HttpGet(GetUserById)]
-        public async Task<ActionResult<ServiceResponse<UserClient>>> GetUser(int id)
+        [HttpGet(GetUserByIdUri)]
+        public async Task<ActionResult<ServiceResponse<User>>> GetUser(int id)
         {
             var result = await _userService.GetUser(id);
             return Ok(result);
         }
 
-        [HttpPost(PostRegister)]
-        public async Task<ActionResult<ServiceResponse<UserClient>>> Register(RegisterRequest request)
+        [HttpPost(PostRegisterUri)]
+        public async Task<ActionResult<ServiceResponse<User>>> Register(RegisterRequest request)
         {
             var result = await _userService.Register(request);
             return Ok(result);
         }
 
-        [HttpPost(PostLogin)]
-        public async Task<ActionResult<ServiceResponse<UserClient>>> Login(LoginRequest request)
+        [HttpPost(PostLoginUri)]
+        public async Task<ActionResult<ServiceResponse<UserBase>>> Login(LoginRequest request)
         {
             var result = await _userService.Login(request);
             return Ok(result);

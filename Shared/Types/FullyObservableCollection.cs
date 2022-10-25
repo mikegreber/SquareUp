@@ -6,18 +6,18 @@ using System.ComponentModel;
 
 namespace SquareUp.Shared.Types;
 
-public sealed class FullyObservableCollection<T> : ObservableCollection<T> where T : INotifyPropertyChanged
+public class FullyObservableCollection<T> : ObservableCollection<T> where T : INotifyPropertyChanged
 {
 
     public FullyObservableCollection() => Initialize();
 
-    public FullyObservableCollection(IEnumerable<T> input) : base(input) => Initialize();
-
-    private void Initialize()
+    public FullyObservableCollection(T item) : this(new List<T>{ item }) { }
+    public FullyObservableCollection(IEnumerable<T> input) : this()
     {
-        // CollectionChanged += FullCollectionChanged;
-        // FullCollectionChanged(this, new NotifyCollectionChangedEventArgs(action: NotifyCollectionChangedAction.Replace, Items, Enumerable.Empty<T>(), 0));
+        foreach(var item in input) Add(item);
     }
+    private void Initialize() => CollectionChanged += FullCollectionChanged;
+
     private void FullCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         if (e.NewItems != null)
@@ -43,11 +43,10 @@ public sealed class FullyObservableCollection<T> : ObservableCollection<T> where
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, item, item, IndexOf(item)));
         }
     }
-
-    // public static implicit operator FullyObservableCollection<T>(IEnumerable<T> enumerable) => new(enumerable);
 }
 
 public static class Extensions
 {
     public static FullyObservableCollection<T> ToFullyObservableCollection<T>(this IEnumerable<T> enumerable) where T : INotifyPropertyChanged => new(enumerable);
+    // public static ObservableCollectionGroup<>
 }

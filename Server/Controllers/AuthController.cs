@@ -1,11 +1,6 @@
-﻿using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using SquareUp.Server.Models;
+﻿using Microsoft.AspNetCore.Mvc;
 using SquareUp.Server.Services.Auth;
 using SquareUp.Server.Services.Users;
-using SquareUp.Shared.Requests;
-using SquareUp.Shared.Types;
 
 namespace SquareUp.Server.Controllers
 {
@@ -22,7 +17,7 @@ namespace SquareUp.Server.Controllers
             _userService = userService;
         }
 
-        [HttpPost("register")]
+        /*[HttpPost("register")]
         public async Task<ActionResult<ServiceResponse<UserClient>>> Register(RegisterRequest request)
         {
             var response = await _authService.Register(
@@ -58,6 +53,6 @@ namespace SquareUp.Server.Controllers
                 return BadRequest(response);
 
             return Ok(response);
-        }
+        }*/
     }
 }

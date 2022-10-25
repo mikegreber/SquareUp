@@ -1,76 +1,55 @@
 ﻿using CommunityToolkit.Maui.Markup;
-using CommunityToolkit.Mvvm.Input;
-using Microsoft.Maui.Layouts;
 using SquareUp.Controls;
-using SquareUp.Model;
-using SquareUp.Shared;
-using SquareUp.Shared.Models;
+using SquareUp.Resources.Themes;
 using SquareUp.ViewModel;
 
 namespace SquareUp.View;
 
 public class GroupsPage : BaseContentPage<GroupsViewModel>
 {
-    public GroupsPage(GroupsViewModel viewModel) : base(in viewModel) { }
-
-    protected override void Build()
+    public static async Task OpenAsync()
     {
-        Title = "Square Up";
-        Content = new AbsoluteLayout
-        {
-            Children =
-            {
-                new ScrollView
-                {
-                    Content = new VerticalStackLayout
-                    {
-                        Spacing = 0,
-                        Padding = 5,
-                        BindingContext = BindingContext,
-                        Children =
-                        {
-                            new Label
-                                {
-                                    BindingContext = BindingContext
-                                }
-                                .Text("Square Up")
-                                .Font(size: 32)
-                                .CenterHorizontal()
-                                .Bind<Label, User, string>
-                                    (Label.TextProperty, "User", convert: user => $"Hello {user.Name}!"),
-
-                            new Label()
-                                .Text("Groups")
-                                .CenterHorizontal()
-                                .Font(size: 18, bold: true),
-                            new CollectionView()
-                                .Bind(ItemsView.ItemsSourceProperty, "User.Groups")
-                                .ItemTemplate(new GroupCardTemplate(BindingContext.OnGroupTap)),
-                        }
-                    }
-                }.LayoutFlags(AbsoluteLayoutFlags.All).LayoutBounds(0, 0, 1, 1),
-                new Button
-                {
-                    Padding = 0,
-                    Margin = 16,
-                    Text = "+",
-                    BackgroundColor = Colors.DeepPink,
-                    BindingContext = this,
-                    CornerRadius = 60, 
-                    WidthRequest = 60, 
-                    HeightRequest = 60, 
-                    Command = new RelayCommand(Add)
-                }
-                    .Font(size: 28)
-                    .LayoutFlags(AbsoluteLayoutFlags.PositionProportional)
-                    .LayoutBounds(1, 1)
-            }
-        };
+        await Shell.Current.GoToAsync(
+            state: nameof(GroupsPage),
+            animate: true
+            // no parameters
+        );
     }
-
-    private async void Add()
+    public GroupsPage(GroupsViewModel viewModel) : base(in viewModel)
     {
-        var result = await DisplayPromptAsync("Create new group", "Group name");
-        if (result != "Cancel") BindingContext.CreateGroup(result);
+        BackView = new Label()
+            .Text("< Sign Out")
+            .Font(size:14)
+            .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.PrimaryTextColor));
+        TitleView = new Label()
+            .Text("Groups")
+            .Font(size:18)
+            .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.PrimaryTextColor));
+
+        Content = new ScrollView
+        {
+            Content = new CollectionView
+            {
+                Margin = 0,
+                IsGrouped = true,
+                ItemSizingStrategy = ItemSizingStrategy.MeasureAllItems,
+                ItemsLayout = new LinearItemsLayout(ItemsLayoutOrientation.Vertical) { ItemSpacing = 5 },
+                GroupHeaderTemplate = new DataTemplate(() => new Label
+                {
+                    HeightRequest = 30,
+                    HorizontalOptions = LayoutOptions.Fill,
+                    HorizontalTextAlignment = TextAlignment.Start,
+                    VerticalTextAlignment = TextAlignment.End
+                }
+                .Margin(0)
+                .Font(bold: true)
+                .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.PrimaryTextColor))
+                .Bind<Label, DateTime, string>(Label.TextProperty, "Key", convert: d => d.ToLongDateString()))
+            }
+            .Margin(new Thickness(0, -24, 0, 72))
+            .Bind(ItemsView.ItemsSourceProperty, "Session.Groups")
+            .ItemTemplate(new GroupCardTemplate(BindingContext.GroupTapCommand)),
+        }
+        .Padding(12, 0);
     }
 }

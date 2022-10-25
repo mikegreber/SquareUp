@@ -1,44 +1,57 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SquareUp.Model;
-using SquareUp.Services.Groups;
-using SquareUp.Services.Users;
-using SquareUp.Shared.Requests;
+using SquareUp.Resources.Themes;
+using SquareUp.Services.Session;
+using SquareUp.Shared.Types;
 using SquareUp.View;
 
 namespace SquareUp.ViewModel;
 
 public partial class GroupsViewModel : BaseViewModel
 {
-    private readonly IUserService _userService;
-    private readonly IGroupService _groupService;
-
-    [ObservableProperty]
-    private UserClient _user = new();
-
     [ObservableProperty]
     private string _message = string.Empty;
 
-    public GroupsViewModel(IUserService userService, IGroupService groupService)
-    {
-        _userService = userService;
-        _groupService = groupService;
+    public GroupsViewModel(ISessionData session) : base(session)
+    { }
 
-        GetData();
-    }
-    
-    public async void GetData() => User = _userService.GetCurrentUser();
-    public async void CreateGroup(string name)
+    public override async Task OnBackButtonClicked()
     {
-        var result = await _groupService.AddGroup(new AddGroupRequest { Name = name, UserId = User.Id });
-        if (!result.Success) return;
-
-        User.Groups.Insert(0, result.Data);
-        await OnGroupTap(User.Groups.First());
+        await base.OnBackButtonClicked();
+        await Session.SignOut();
     }
 
-    public async Task OnGroupTap(GroupClient group)
+    public override Func<Task> OnActionButtonClicked { get; set; } = async () =>
     {
-        await Shell.Current.GoToAsync(nameof(GroupPage), new Dictionary<string, object> { [nameof(group.Id)] = group.Id });
+        await GroupDetailsPage.OpenAsync(new ObservableGroup { Color = ThemeBase.GroupColors.First() }, PageMode.Create, "Create Group");
+    };
+
+    [RelayCommand]
+    public async Task Refresh()
+    {
+        await Session.GetUserGroups(refresh: true);
     }
+
+    [RelayCommand]
+    public async Task OnGroupTap(ObservableGroupInfo group)
+    {
+        await GroupPage.OpenAsync(group);
+    }
+}
+
+public class GroupInfoList : GroupedFullyObservableCollection<DateTime, ObservableGroupInfo>
+{
+    public GroupInfoList() : base(
+        compareGroups: (time, group) => group.Date.Date.CompareTo(time),
+        compareItems: (e1, e2) => e2.Date.CompareTo(e1.Date),
+        getGroupKey: transaction => transaction.Date.Date)
+    { }
+
+    public GroupInfoList(IEnumerable<ObservableGroupInfo> groups) : base(
+        input: groups,
+        compareGroups: (time, group) => group.Date.Date.CompareTo(time),
+        compareItems: (e1, e2) => e2.Date.CompareTo(e1.Date),
+        getGroupKey: transaction => transaction.Date.Date)
+    { }
 }

@@ -1,95 +1,128 @@
 ﻿using CommunityToolkit.Maui.Markup;
 using Microsoft.Maui.Layouts;
 using SquareUp.Controls;
+using SquareUp.Library;
+using SquareUp.Model;
+using SquareUp.Resources.Themes;
 using SquareUp.ViewModel;
 
 namespace SquareUp.View;
 
 public class GroupPage : BaseContentPage<GroupViewModel>
 {
+    public static async Task OpenAsync(ObservableGroupInfo group)
+    {
+        await Shell.Current.GoToAsync(state:
+            nameof(GroupPage),
+            animate: true,
+            parameters: GroupViewModel.Params(group));
+    }
     public GroupPage(GroupViewModel viewModel) : base(viewModel)
     {
-        // Title = "Group";
-    }
+        BackView = new Label()
+            .Text("< Groups")
+            .CenterHorizontal()
+            .CenterVertical()
+            .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.PrimaryTextColor));
+        
+        ActionView = new Image()
+            .Source("settings_white.png")
+            .Size(40)
+            .BindTapGesture(nameof(BindingContext.TapSettingsCommand))
+            .BindingContext(BindingContext);
 
-    protected override void Build()
-    {
-        // Title = "Square Up" + Navigation.NavigationStack.Count;
-
-        Content = new AbsoluteLayout
+        Content = new ScrollView
         {
-            Children =
+            Content = new VerticalStackLayout
             {
-                new ScrollView
-                {
-                    Content = new VerticalStackLayout
-                    {
-                        Spacing = 0,
-                        Padding = 5,
-                        BindingContext = BindingContext,
-                        Children =
+                Spacing = 0,
+                Padding = 12,
+                BindingContext = BindingContext,
+                Children =
                         {
-                            new RefreshView
+                            new Frame
+                            {
+                                Padding = new Thickness(20, 16,20,20),
+                                CornerRadius = 10,
+                                BindingContext = BindingContext,
+                                Content = new VerticalStackLayout
                                 {
-                                    Content = new Label().Text("Refresh"),
+                                    Children =
+                                    {
+                                        new Label()
+                                            .Padding(0)
+                                            .Bind(Label.TextProperty, "Session.Group.Name")
+                                            .Font(bold:true, size:24)
+                                            .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.White)),
+
+                                        new Label()
+                                            .Text("Total Debt")
+                                            .Margin(new Thickness(0,4,0,40))
+                                            .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.White)),
+
+                                        new FlexLayout
+                                        {
+                                            HeightRequest = 30,
+                                            HorizontalOptions = LayoutOptions.Fill,
+                                            AlignContent = FlexAlignContent.SpaceBetween,
+                                            AlignItems = FlexAlignItems.Stretch,
+                                            Direction = FlexDirection.Row,
+                                            Children =
+                                            {
+                                                new Label
+                                                    {
+                                                        VerticalTextAlignment = TextAlignment.Center,
+                                                        GestureRecognizers =
+                                                        {
+                                                            new TapGestureRecognizer()
+                                                                .BindCommand(nameof(BindingContext.TapDebtsCommand))
+                                                        }
+
+                                                    }
+                                                    .Text("Debts >")
+                                                    .Font(size:20)
+                                                    .Grow(0.75f)
+                                                    .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.White)),
+
+                                                // new Image()
+                                                //     .Source("dotnet_bot.png")
+                                                //     .Size(40)
+                                                //     .BindTapGesture(nameof(BindingContext.TapSettingsCommand)),
+
+                                            }
+                                        }
+                                    }
                                 }
-                                
-                                .Bind(RefreshView.IsRefreshingProperty, nameof(BindingContext.IsRefreshing))
-                                .Bind(RefreshView.CommandProperty, nameof(BindingContext.PullToRefreshCommand)),
-                                
-                            new DebtCardTemplate.DebtCard().Bind(DebtCardTemplate.DebtCard.DebtsProperty, "Debts"),
+                            }.Bind<Frame, string, LinearGradientBrush>(BackgroundProperty, "Session.Group.Color", convert: Converters.ConvertBackground),
 
-                            new Label()
-                                .Text("People")
-                                .Margin(10, 0)
-                                .Font(size: 18, bold: true),
-                            new CollectionView()
-                                .Bind(ItemsView.ItemsSourceProperty, "Group.Users")
-                                .ItemTemplate(new UserCardTemplate(BindingContext.OnUserTap)),
-                                
+                            new CollectionView
+                                {
+                                    Margin = 0,
+                                    IsGrouped = true,
+                                    ItemSizingStrategy = ItemSizingStrategy.MeasureAllItems,
+                                    ItemsLayout = new LinearItemsLayout(ItemsLayoutOrientation.Vertical)
+                                    {
+                                        ItemSpacing = 5,
+                                    },
+                                    GroupHeaderTemplate = new DataTemplate(()=> new Label
+                                        {
+                                            HeightRequest = 30,
 
-                            new Label()
-                                .Text("Expenses")
-                                .Margin(10, 0)
-                                .Font(size: 18, bold: true),
-                            new CollectionView()
-                                .Bind(ItemsView.ItemsSourceProperty, "Group.Expenses")
-                                .ItemTemplate(new ExpenseCardTemplate(BindingContext.OnExpenseTap))
-
+                                            HorizontalOptions = LayoutOptions.Fill,
+                                            HorizontalTextAlignment = TextAlignment.Center,
+                                            VerticalTextAlignment = TextAlignment.End
+                                        }
+                                        .Margin(0)
+                                        .Font(bold:true)
+                                        .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.Gray50))
+                                        .Bind<Label, DateTime, string>(Label.TextProperty, "Key", convert: d => d.ToLongDateString().ToUpper())
+                                    )
+                                }
+                                .Margin(new Thickness(0, 0, 0, 72))
+                                .Bind(ItemsView.ItemsSourceProperty, "Session.Group.Transactions")
+                                .ItemTemplate(new TransactionCardTemplate(BindingContext.TapTransactionCommand)),
                         }
-                    }
-                }.LayoutFlags(AbsoluteLayoutFlags.All).LayoutBounds(0, 0, 1, 1),
-
-
-                new Button
-                {
-                    Padding = 0,
-                    Margin = 16,
-                    Text = "+",
-                    BackgroundColor = Colors.DeepPink,
-                    BindingContext = this,
-                    CornerRadius = 60, WidthRequest = 60, HeightRequest = 60, Command = new Command(OpenPopup)
-                }.Font(size: 28).LayoutFlags(AbsoluteLayoutFlags.PositionProportional).LayoutBounds(1, 1)
             }
         };
-    }
-
-    public async void OpenPopup()
-    {
-        var action = await DisplayActionSheet("Create new", "Cancel", null, "Person", "Expense");
-        switch (action)
-        {
-            case "Person":
-                await BindingContext.AddPerson(this);
-                break;
-            case "Expense":
-                await BindingContext.AddExpense(this);
-                break;
-        }
-
-        async void OnOkClicked(object obj)
-        {
-            await DisplayAlert("Title", obj.ToString(), "Cancel");
-        }
     }
 }

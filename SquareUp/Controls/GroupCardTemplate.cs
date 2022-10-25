@@ -1,59 +1,113 @@
 ﻿using CommunityToolkit.Maui.Markup;
+using CommunityToolkit.Mvvm.Input;
+using Microsoft.Maui.Layouts;
+using SquareUp.Library;
 using SquareUp.Model;
+using SquareUp.Resources.Themes;
 using SquareUp.View;
 
 namespace SquareUp.Controls;
 
 public partial class GroupCardTemplate : DataTemplate
 {
-    public delegate Task OnTapDelegate(GroupClient group);
+    public GroupCardTemplate(IRelayCommand<ObservableGroupInfo>? onTap = null) :
+        base(() => new GroupCard().Bind(GroupCard.GroupProperty).Bind(GroupCard.CommandProperty, source: onTap)) { }
 
-    public GroupCardTemplate(OnTapDelegate? onTap = null) : base(() =>
-        new GroupCard(onTap).Bind(GroupCard.GroupProperty))
-    {
-    }
-
-    public class GroupCard : ContentView
+    public partial class GroupCard : ContentView
     {
         public static readonly BindableProperty GroupProperty = BindableProperty.Create(
-            nameof(Group),
-            typeof(GroupClient),
-            typeof(GroupCard),
+            propertyName: nameof(Group),
+            returnType: typeof(ObservableGroupInfo),
+            declaringType: typeof(GroupCard),
             defaultBindingMode: BindingMode.OneWay
         );
 
-        public GroupClient Group
+        public ObservableGroupInfo Group
         {
-            get => (GroupClient)GetValue(GroupProperty);
+            get => (ObservableGroupInfo)GetValue(GroupProperty);
             set => SetValue(GroupProperty, value);
         }
 
-        public GroupCard(OnTapDelegate? onTap = null)
+        [RelayCommand]
+        private static void OpenGroup(ObservableGroupInfo group)
         {
-            
-            Content = new Frame
-            {
-                BindingContext = this,
-                GestureRecognizers =
-                {
-                    new TapGestureRecognizer
-                    {
-                        Command = new Command(() => onTap?.Invoke(Group))
-                    }
-                },
-
-                HeightRequest = 60,
-                Margin = 10,
-                Content = new Label().Text("Text").Height(30).Bind(Label.TextProperty, "Group.Name")
-            };
+            GroupPage.OpenAsync(group);
         }
 
-        
+        public static readonly BindableProperty CommandProperty = BindableProperty.Create(
+            propertyName: nameof(Command),
+            returnType: typeof(IRelayCommand<ObservableGroupInfo>),
+            declaringType: typeof(GroupCard),
+            defaultBindingMode: BindingMode.OneWay
+        );
 
-        private void OnTap()
+        public IRelayCommand<ObservableGroupInfo> Command
         {
-            Shell.Current.GoToAsync(nameof(GroupPage),
-                new Dictionary<string, object> { [nameof(Group.Id)] = Group.Id });
+            get => (IRelayCommand<ObservableGroupInfo>)GetValue(CommandProperty);
+            set => SetValue(CommandProperty, value);
+        }
+
+        public GroupCard()
+        {
+            Content = new Frame
+                {
+                    CornerRadius = 10,
+                    Content = new VerticalStackLayout
+                    {
+                        Children =
+                        {
+                            new FlexLayout {
+                                    AlignContent = FlexAlignContent.SpaceBetween,
+                                    AlignItems = FlexAlignItems.Center,
+                                    Direction = FlexDirection.Row,
+                                    Children =
+                                    {
+                                        new Label()
+                                            .Font(bold: true, size: 24)
+                                            .Padding(0)
+                                            .Bind(Label.TextProperty, "Group.Name")
+                                            .Grow(1)
+                                            .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.PrimaryTextColor)),
+
+                                        new Image()
+                                            .Margins(top:1)
+                                            .Source("person.png")
+                                            .Size(15)
+                                            .CenterVertical(),
+
+                                        new Label()
+                                            .Font(bold: true, size: 16)
+                                            .Bind(Label.TextProperty, "Group.Participants")
+                                            .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.PrimaryTextColor)),
+                                    }
+                                }
+                                .Height(30)
+                                .FillHorizontal(),
+
+                            new Label()
+                                .Text("Last edited:")
+                                .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.SecondaryTextColor)),
+
+                            new Label()
+                                .Padding(0)
+                                .Font(bold: false, size: 16)
+                                .Bind<Label, DateTime, string>(Label.TextProperty, "Group.LastEdit", convert: d => $"{d.ToLongDateString()}")
+                                .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.SecondaryTextColor)),
+                            
+                            new Label()
+                                .Padding(0)
+                                .Font(bold: false, size: 14)
+                                .Bind<Label, DateTime, string>(Label.TextProperty, "Group.LastEdit", convert: d => $"{d.ToShortTimeString()}")
+                                .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.SecondaryTextColor)),
+                        }
+                    }
+                }
+                .Paddings(20,16,20,20)
+                .BindTapGesture(nameof(Command), parameterPath: nameof(Group))
+                .Bind<Frame, string, LinearGradientBrush>(BackgroundProperty, "Group.Color", convert: Converters.ConvertBackground)
+                .BindingContext(this);
         }
     }
 }
+
+

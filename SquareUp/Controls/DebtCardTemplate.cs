@@ -38,6 +38,7 @@ public class DebtCardTemplate : DataTemplate
                             Children =
                             {
                                 new Label().Bind(Label.TextProperty, "User.Name"),
+                                new Label().Bind(Label.TextProperty, "Proportion"),
                                 new Label().Bind(Label.TextProperty, "Total"),
                             }
                         };

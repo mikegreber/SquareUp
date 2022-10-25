@@ -22,11 +22,11 @@ public class AuthService : IAuthService
         _configuration = configuration;
         _httpContextAccessor = httpContextAccessor;
     }
-    public async Task<ServiceResponse<UserClient>> Register(UserData user, string password)
+    public async Task<ServiceResponse<User>> Register(UserData user, string password)
     {
         if (await UserExists(user.Email))
         {
-            return new ServiceResponse<UserClient>(message: $"{user.Email} is already in use.");
+            return new ServiceResponse<User>(message: $"{user.Email} is already in use.");
         }
 
         CreatePasswordHash(password, out var hash, out var salt);
@@ -36,7 +36,7 @@ public class AuthService : IAuthService
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
-        return new ServiceResponse<UserClient>(user, $"{user.Email} successfully registered.");
+        return new ServiceResponse<User>(user, $"{user.Email} successfully registered.");
     }
 
     public async Task<bool> UserExists(string email)

@@ -37,7 +37,34 @@ namespace SquareUp.Server.Migrations
                     b.ToTable("GroupDataUserData");
                 });
 
-            modelBuilder.Entity("SquareUp.Server.Models.ExpenseData", b =>
+            modelBuilder.Entity("SquareUp.Server.Models.GroupData", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("LastEdit")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Groups");
+                });
+
+            modelBuilder.Entity("SquareUp.Server.Models.TransactionData", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -48,43 +75,34 @@ namespace SquareUp.Server.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int?>("GroupDataId")
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("GroupId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ParticipantId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SecondaryParticipantId")
+                        .HasColumnType("int");
 
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("GroupDataId");
+                    b.HasIndex("GroupId");
 
-                    b.HasIndex("UserId");
-
-                    b.ToTable("ExpenseData");
-                });
-
-            modelBuilder.Entity("SquareUp.Server.Models.GroupData", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Groups");
+                    b.ToTable("Transactions");
                 });
 
             modelBuilder.Entity("SquareUp.Server.Models.UserData", b =>
@@ -120,6 +138,31 @@ namespace SquareUp.Server.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("SquareUp.Shared.Models.Participant", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int?>("GroupDataId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GroupDataId");
+
+                    b.ToTable("Participants");
+                });
+
             modelBuilder.Entity("GroupDataUserData", b =>
                 {
                     b.HasOne("SquareUp.Server.Models.GroupData", null)
@@ -135,24 +178,29 @@ namespace SquareUp.Server.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("SquareUp.Server.Models.ExpenseData", b =>
+            modelBuilder.Entity("SquareUp.Server.Models.TransactionData", b =>
                 {
-                    b.HasOne("SquareUp.Server.Models.GroupData", null)
-                        .WithMany("Expenses")
-                        .HasForeignKey("GroupDataId");
-
-                    b.HasOne("SquareUp.Server.Models.UserData", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
+                    b.HasOne("SquareUp.Server.Models.GroupData", "Group")
+                        .WithMany("Transactions")
+                        .HasForeignKey("GroupId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("Group");
+                });
+
+            modelBuilder.Entity("SquareUp.Shared.Models.Participant", b =>
+                {
+                    b.HasOne("SquareUp.Server.Models.GroupData", null)
+                        .WithMany("Participants")
+                        .HasForeignKey("GroupDataId");
                 });
 
             modelBuilder.Entity("SquareUp.Server.Models.GroupData", b =>
                 {
-                    b.Navigation("Expenses");
+                    b.Navigation("Participants");
+
+                    b.Navigation("Transactions");
                 });
 #pragma warning restore 612, 618
         }

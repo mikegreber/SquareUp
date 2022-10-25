@@ -1,50 +1,51 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using CommunityToolkit.Maui.Markup;
+using SquareUp.Resources.Themes;
 using SquareUp.ViewModel;
-using CommunityToolkit.Maui.Markup;
-using Microsoft.Maui.Layouts;
-namespace SquareUp.View
+
+namespace SquareUp.View;
+
+public class LoginPage : BaseContentPage<LoginViewModel>
 {
-    public class LoginPage : BaseContentPage<LoginViewModel>
+    public LoginPage(LoginViewModel viewModel) : base(viewModel)
     {
-        public LoginPage(LoginViewModel viewModel) : base(viewModel)
+        TitleView = new Label()
+            .Text("Login")
+            .Font(size:16)
+            .CenterVertical()
+            .CenterHorizontal()
+            .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.PrimaryTextColor));
+
+        Content = new StackLayout
         {
-            
-        }
+            Margin = 30,
+            MaximumWidthRequest = 600,
+            Children =
+                    {
+                        new Label { Text = "Email" }
+                            .Text("Email")
+                            .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.SecondaryTextColor)),
+                        new Entry { Placeholder = "example@mail.com" }
+                            .Bind(Entry.TextProperty, "LoginRequest.Email")
+                            .DynamicResource(Entry.TextColorProperty, nameof(ThemeBase.SecondaryTextColor)),
+                        
+                        new Label { Text = "Password" }
+                            .DynamicResource(Label.TextColorProperty,
+                            nameof(ThemeBase.SecondaryTextColor)),
+                        new Entry{ IsPassword = true, Placeholder = "****" }
+                            .Bind(Entry.TextProperty, "LoginRequest.Password"),
+                        
+                        new Button()
+                            .Text("Login")
+                            .BindCommand(nameof(BindingContext.LoginCommand))
+                            .DynamicResource(Button.StyleProperty, nameof(ThemeBase.ButtonCreateStyle)),
 
-        protected override void Build()
-        {
-            
-
-            Content = new StackLayout
-            {
-                BindingContext = BindingContext,
-                Margin=30,
-                Children = {
-                    new Label().Text("Login").Font(size:36),
-                    new Label { Text = "Email" }.Text("Email"),
-                    new Entry{}.Bind(Entry.TextProperty, "LoginRequest.Email"),
-                    new Label { Text = "Password" },
-                    new Entry{}.Bind(Entry.TextProperty, "LoginRequest.Password"),
-                    new Button().Text("Login").BindCommand(nameof(BindingContext.LoginCommand)),
-
-                    new Label().Text("Register").Font(size:36),
-                    new Label { Text = "Name" },
-                    new Entry{}.Bind(Entry.TextProperty, "RegisterRequest.Name"),
-                    new Label { Text = "Email" }.Text("Email"),
-                    new Entry{}.Bind(Entry.TextProperty, "RegisterRequest.Email"),
-                    new Label { Text = "Password" },
-                    new Entry{}.Bind(Entry.TextProperty, "RegisterRequest.Password"),
-                    new Label { Text = "ConfirmPassword"},
-                    new Entry{}.Bind(Entry.TextProperty, "RegisterRequest.ConfirmPassword"),
-                    new BoxView().Size(10, 10),
-                    new Button().Text("Register").BindCommand(nameof(BindingContext.RegisterCommand)),
-
-                    new Label().Bind(Label.TextProperty, "Message"),
-                }
-            };
-        }
+                        new Label()
+                            .Text("Register")
+                            .CenterHorizontal()
+                            .Padding(12)
+                            .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.SecondaryTextColor))
+                            .BindTapGesture(nameof(BindingContext.RegisterCommand))
+                    }
+        };
     }
 }

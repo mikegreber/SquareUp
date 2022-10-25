@@ -1,7 +1,11 @@
-﻿using System.Security.Cryptography;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Cryptography;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using SquareUp.Server.Data;
 using SquareUp.Server.Models;
+using SquareUp.Shared.Models;
 using SquareUp.Shared.Requests;
 using SquareUp.Shared.Types;
 
@@ -10,25 +14,30 @@ namespace SquareUp.Server.Services.Users;
 public class UserService : IUserService
 {
     private readonly DataContext _context;
+    private readonly IConfiguration _configuration;
 
-    public UserService(DataContext context) => _context = context;
+    public UserService(DataContext context, IConfiguration configuration)
+    {
+        _context = context;
+        _configuration = configuration;
+    }
 
     public Task<ServiceResponse<User>> GetCurrentUser()
     {
         throw new NotImplementedException();
     }
 
-    public async Task<ServiceResponse<List<UserClient>>> GetUsers()
+    public async Task<ServiceResponse<List<User>>> GetUsers()
     {
         var result = await _context.Users
             .Include(u => u.Groups)
-            .Select(u => new UserClient(u))
+            .Select(u => new User(u))
             .ToListAsync();
         
-        return new ServiceResponse<List<UserClient>>(result, $"{result.Count} users.");
+        return new ServiceResponse<List<User>>(result, $"{result.Count} users.");
     }
 
-    public async Task<ServiceResponse<UserClient>> GetUser(int id)
+    public async Task<ServiceResponse<User>> GetUser(int id)
     {
         var user = await _context.Users
             .Include(u => u.Groups)
@@ -36,49 +45,47 @@ public class UserService : IUserService
 
         if (user == null)
         {
-            return new ServiceResponse<UserClient>(message: "User not found.");
+            return new ServiceResponse<User>(message: "User not found.");
         }
 
-        return new ServiceResponse<UserClient>(user, "User found.");
+        return new ServiceResponse<User>(user, "User found.");
     }
 
-    public async Task<ServiceResponse<UserClient>> GetUser(string email)
+    public async Task<ServiceResponse<User>> GetUser(string email)
     {
         email = email.ToLower();
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
         if (user == null)
         {
-            return new ServiceResponse<UserClient>(message: "User not found.");
+            return new ServiceResponse<User>(message: "User not found.");
         }
 
-        return new ServiceResponse<UserClient>(user, message: "User found");
+        return new ServiceResponse<User>(user, message: "User found");
     }
 
-    public async Task<ServiceResponse<UserClient>> Login(LoginRequest loginRequest)
+    public async Task<ServiceResponse<UserBase>> Login(LoginRequest loginRequest)
     {
         loginRequest.Email = loginRequest.Email.ToLower();
         var user = await _context.Users
             .Where(u => u.Email == loginRequest.Email)
-            .Include(u => u.Groups).ThenInclude(g => g.Expenses)
-            .Include(u => u.Groups).ThenInclude(g => g.Users)
             .FirstOrDefaultAsync();
 
         if (user == null || !VerifyPasswordHash(loginRequest.Password, user.PasswordHash, user.PasswordSalt))
         {
-            return new ServiceResponse<UserClient>(message: "Incorrect username or password.");
+            return new ServiceResponse<UserBase>(message: "Incorrect username or password.");
         }
 
-        return new ServiceResponse<UserClient>(user, "Login success.");
+        return new ServiceResponse<UserBase>(user, CreateToken(user));
     }
 
-    public async Task<ServiceResponse<UserClient>> Register(RegisterRequest request)
+    public async Task<ServiceResponse<User>> Register(RegisterRequest request)
     {
         if (await UserExists(request.Email))
         {
-            return new ServiceResponse<UserClient>(message: $"{request.Email} is already in use.");
+            return new ServiceResponse<User>(message: $"{request.Email} is already in use.");
         }
 
-        var user = new UserData{ Name = request.Name, Email = request.Email };
+        var user = new UserData{ Name = request.Name, Email = request.Email, Image = "dotnet_bot.svg" };
 
         CreatePasswordHash(request.Password, out var hash, out var salt);
         user.PasswordHash = hash;
@@ -87,7 +94,7 @@ public class UserService : IUserService
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
-        return new ServiceResponse<UserClient>(user, $"{request.Email} successfully registered.");
+        return new ServiceResponse<User>(user, CreateToken(user));
     }
 
     public async Task<bool> UserExists(string email)
@@ -111,25 +118,25 @@ public class UserService : IUserService
         return computedHash.SequenceEqual(passwordHash);
     }
 
-    // private string CreateToken(User user)
-    // {
-    //     var claims = new List<Claim>
-    //     {
-    //         new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-    //         new(ClaimTypes.Name, user.Name),
-    //         new(ClaimTypes.Email, user.Email),
-    //     };
-    //
-    //     var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
-    //
-    //     var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-    //
-    //     var token = new JwtSecurityToken(
-    //         claims: claims,
-    //         expires: DateTime.Now.AddDays(1),
-    //         signingCredentials: credentials
-    //     );
-    //
-    //     return new JwtSecurityTokenHandler().WriteToken(token);
-    // }
+    private string CreateToken(User user)
+    {
+        var claims = new List<Claim>
+        {
+            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new(ClaimTypes.Name, user.Name),
+            new(ClaimTypes.Email, user.Email),
+        };
+    
+        var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
+    
+        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+    
+        var token = new JwtSecurityToken(
+            claims: claims,
+            expires: DateTime.Now.AddDays(1),
+            signingCredentials: credentials
+        );
+    
+        return new JwtSecurityTokenHandler().WriteToken(token);
+    }
 }

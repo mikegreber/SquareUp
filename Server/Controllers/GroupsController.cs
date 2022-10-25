@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SquareUp.Server.Models;
 using SquareUp.Server.Services.Groups;
+using SquareUp.Shared.Models;
 using SquareUp.Shared.Requests;
 using SquareUp.Shared.Types;
 using static SquareUp.Shared.ControllerEndpoints.Groups;
@@ -18,40 +20,86 @@ public class GroupsController : ControllerBase
         _service = service;
     }
 
+    [Authorize]
+    [HttpGet("test")]
+    public async Task<ServiceResponse<string>> Test() =>
+        new (data: "String Result", message: "Here is the message.");
 
-    [HttpGet(GetAllPath)]
-    public async Task<ActionResult<ServiceResponse<List<GroupClient>>>> GetGroups()
+    [HttpGet(GetAllUri)]
+    public async Task<ActionResult<ServiceResponse<List<Group>>>> GetGroups()
     {
         var result = await _service.GetGroups();
         return Ok(result);
     }
 
-    [HttpGet(GetGroupById)]
-    public async Task<ActionResult<ServiceResponse<GroupClient>>> GetGroup(int id)
+    [HttpGet(GetAllInfoUri)]
+    public async Task<ActionResult<ServiceResponse<List<GroupInfo>>>> GetGroupsInfo()
     {
-        var result = await _service.GetGroup(id);
+        var result = await _service.GetGroupsInfo();
         return Ok(result);
     }
 
 
-    [HttpPost(PostAddGroup)]
-    public async Task<ActionResult<ServiceResponse<GroupClient>>> AddGroup(AddGroupRequest request)
+    [HttpGet(GetGroupsByUserIdUri)]
+    public async Task<ActionResult<ServiceResponse<Group>>> GetGroups(int id)
     {
-        var result = await _service.AddGroup(request);
+        var result = await _service.GetUserGroups(Request);
         return Ok(result);
     }
 
-    [HttpPost(PostAddExpense)]
-    public async Task<ActionResult<ServiceResponse<Expense>>> AddExpense(AddExpenseRequest request)
+    [HttpGet(GetGroupsInfoByUserIdUri)]
+    public async Task<ActionResult<ServiceResponse<GroupInfo>>> GetGroupsInfo(int id)
     {
-        var result = await _service.AddExpense(request);
+        var result = await _service.GetUserGroupsInfo(Request);
         return Ok(result);
     }
 
-    [HttpPost(PostAddUser)]
-    public async Task<ActionResult<ServiceResponse<User>>> AddUser(AddUserRequest request)
+    [HttpGet(GetGroupByIdUri)]
+    public async Task<ActionResult<ServiceResponse<Group>>> GetGroup(int id)
     {
-        var result = await _service.AddUser(request);
+        var result = await _service.GetGroup(Request, id);
+        return Ok(result);
+    }
+
+    [HttpPost(PostAddGroupUri)]
+    public async Task<ActionResult<ServiceResponse<GroupInfo>>> CreateGroup(GroupBase group)
+    {
+        var result = await _service.CreateGroup(Request, group);
+        return Ok(result);
+    }
+
+    [HttpPost(PostAddParticipantUri)]
+    public async Task<ActionResult<ServiceResponse<GroupInfo>>> AddParticipant(AddParticipantRequest request)
+    {
+        var result = await _service.AddParticipant(Request, request);
+        return Ok(result);
+    }
+
+    [HttpPost(PostInviteParticipantUri)]
+    public async Task<ActionResult<ServiceResponse<GroupInfo>>> InviteParticipant(InviteParticipantRequest request)
+    {
+        var result = await _service.InviteParticipant(Request, request);
+        return Ok(result);
+    }
+
+    [HttpPost(PostAddUserUri)]
+    public async Task<ActionResult<ServiceResponse<User>>> AddUser(AddUserRequest payload)
+    {
+        var result = await _service.AddUser(Request, payload);
+        return Ok(result);
+    }
+
+    [HttpPut(PutEditGroupUri)]
+    public async Task<ActionResult<ServiceResponse<GroupInfo>>> UpdateGroup(GroupRequest payload)
+    {
+        var result = await _service.UpdateGroup(Request, payload);
+        return Ok(result);
+    }
+
+    [HttpDelete(DeleteGroupUri)]
+    public async Task<ActionResult<ServiceResponse<int>>> DeleteGroup(int id)
+    {
+        var result = await _service.DeleteGroup(Request, id);
         return Ok(result);
     }
 

@@ -1,4 +1,6 @@
-﻿namespace SquareUp.Shared.Types;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace SquareUp.Shared.Types;
 
 public class ServiceResponse<T>
 {
@@ -9,6 +11,8 @@ public class ServiceResponse<T>
     }
 
     public T? Data { get; }
+
+    [NotMapped]
     public bool Success => Data != null;
-    public string Message { get; }
+    public string Message { get; set; }
 }

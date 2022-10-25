@@ -1,38 +1,22 @@
 ﻿using SquareUp.Shared.Models;
-using System.Text.RegularExpressions;
 
 namespace SquareUp.Server.Models;
 
-public class GroupData
+public class GroupData : Group<List<UserData>, List<Participant>, List<TransactionData>>
 {
-    public int Id { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public List<UserData> Users { get; set; } = new();
-    public List<ExpenseData> Expenses { get; set; } = new();
+    public GroupData() { }
+    public GroupData(IGroupBase group) : base(group) { }
 
-    public static implicit operator GroupClient(GroupData data) => new(data);
     public static implicit operator Group(GroupData data) => new(data);
+    public static implicit operator GroupInfo(GroupData data) => new(data, data.Users.Count);
 }
 
-public class Group : IGroup
+public class Group : Group<List<UserBase>, List<Participant>, List<TransactionBase>>
 {
-    public Group(GroupData data)
+    public Group(GroupData data) : base(data)
     {
-        Name = data.Name;
+        Users = data.Users.Select(u => u as UserBase).ToList();
+        Transactions = data.Transactions.Select(e => new TransactionBase(e)).ToList();
+        Participants = data.Participants;
     }
-    public string Name { get; set; }
-}
-
-public class GroupClient : Group, IGroupClient<List<User>, User, List<Expense>, Expense>
-{
-    public GroupClient(GroupData data) : base(data)
-    {
-        Id = data.Id;
-        Users = data.Users.Select(u => new User(u)).ToList();
-        Expenses = data.Expenses.Select(e => new Expense(e)).ToList();
-    }
-
-    public int Id { get; set; }
-    public List<User> Users { get; set; }
-    public List<Expense> Expenses { get; set; }
 }

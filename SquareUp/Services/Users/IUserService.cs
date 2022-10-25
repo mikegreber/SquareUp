@@ -6,7 +6,7 @@ namespace SquareUp.Services.Users;
 
 public interface IUserService
 {
-    UserClient? GetCurrentUser();
-    Task<ServiceResponse<UserClient>> Login(LoginRequest request);
-    Task<ServiceResponse<UserClient>> Register(RegisterRequest request);
+    ObservableUserBase? GetCurrentUser();
+    Task<ServiceResponse<ObservableUserBase>> Login(LoginRequest request);
+    Task<ServiceResponse<ObservableUserBase>> Register(RegisterRequest request);
 }

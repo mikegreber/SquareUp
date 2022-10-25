@@ -1,14 +1,43 @@
-﻿
-using SquareUp.Model;
-using CommunityToolkit.Mvvm.ComponentModel;
-using IQueryAttributable = SquareUp.Model.IQueryAttributable;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using SquareUp.Services.Session;
 
 namespace SquareUp.ViewModel;
 
 [INotifyPropertyChanged]
 public abstract partial class BaseViewModel
 {
-    protected BaseViewModel() { }
+    public ISessionData Session { get; }
 
-    public IQueryAttributable.OnAttributesSetDelegate OnAttributesSet { get; set; }
+    protected bool AnimateBackTransitions = true;
+
+    protected BaseViewModel(ISessionData session)
+    {
+        Session = session;
+    }
+
+    public virtual async Task OnBackButtonClicked()
+    {
+        await Shell.Current.GoToAsync("..", AnimateBackTransitions);
+    }
+
+    public virtual Func<Task> OnActionButtonClicked { get; set; } = null;
+
+    [RelayCommand]
+    private async Task Back()
+    {
+        await OnBackButtonClicked();
+    }
+
+    [RelayCommand]
+    protected async Task ActionButton()
+    {
+        if (OnActionButtonClicked != null) await OnActionButtonClicked();
+    }
+
+    
+
+    protected Page Page => Application.Current!.MainPage!;
 }
+
+public enum PageMode { Create, Edit }

@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "mssql2": {
+      "secretStore": "AzureAppSettings",
+      "type": "mssql.onprem",
+      "connectionId": "ConnectionStrings:DefaultConnection",
+      "dynamicId": null
+    },
+    "mssql1": {
+      "secretStore": "AzureAppSettings",
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/squareup-dbserver/databases/SquareUp.Server_db",
+      "type": "mssql.azure",
+      "connectionId": "ConnectionStrings:SquareUpDbConnection"
+    }
+  }
+}
