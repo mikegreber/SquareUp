@@ -3,7 +3,7 @@ public class Theme
 {
     public static ResourceDictionary Resources => Application.Current.Resources;
 
-    public static Style ShellStyle => Resources[nameof(ThemeBase.ShellStyle)] as Style;
+    //public static Style ShellStyle => Resources[nameof(ThemeBase.ShellStyle)] as Style;
     public static Style EntryStyle => Resources[nameof(ThemeBase.EntryStyle)] as Style;
     public static Style ButtonCreateStyle => Resources[nameof(ThemeBase.ButtonCreateStyle)] as Style;
     public static Style ButtonCreateDisabledStyle => Resources[nameof(ThemeBase.ButtonCreateDisabledStyle)] as Style;

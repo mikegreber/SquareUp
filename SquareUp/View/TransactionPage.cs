@@ -17,57 +17,21 @@ public class TransactionPage : BaseContentPage<TransactionViewModel>
     {
         await Shell.Current.GoToAsync(state: 
             nameof(TransactionPage), 
-            animate: false,
+            animate: true,
             parameters: TransactionViewModel.Params(transaction, mode, title));
     }
 
-    private enum Row { First }
-    private enum Column { Left, Middle, Right }
-
     public TransactionPage(TransactionViewModel viewModel) : base(viewModel)
     {
-        ShowAppBar = false;
-        
+        BackButton = "< cancel";
+        this.Bind(TitleProperty, nameof(BindingContext.Title));
+
         Content = new ScrollView
         {
             Content = new VerticalStackLayout
             {
                 Children =
                 {
-                    new Grid
-                        {
-                            ColumnDefinitions = Columns.Define(
-                                (Column.Left, 55),
-                                (Column.Middle, GridLength.Star),
-                                (Column.Right, 55)
-                            ),
-
-                            RowDefinitions = Rows.Define((Row.First, 56)),
-
-                            Children =
-                            {
-                                new Label()
-                                    .Bind(Label.TextProperty, nameof(BindingContext.Title))
-                                    .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.PrimaryTextColor))
-                                    .Font(size: 18, bold: true)
-                                    .CenterHorizontal()
-                                    .CenterVertical()
-                                    .Column(Column.Middle),
-
-                                new Image()
-                                    .Source("close_white.png")
-                                    .Size(20)
-                                    .End()
-                                    .BindTapGesture(nameof(BindingContext.BackCommand))
-                                    .Column(Column.Right),
-                            },
-                        }
-                        .Height(56)
-                        .Padding(16,0)
-                        .Margin(0)
-                        .FillHorizontal()
-                        .Bind<Grid, string, Brush>(BackgroundProperty, "Session.Group.Color", convert: Converters.ConvertBackground),
-
                     new Label()
                         .Text("Description")
                         .DynamicResource(StyleProperty, nameof(ThemeBase.CategoryHeaderStyle)),

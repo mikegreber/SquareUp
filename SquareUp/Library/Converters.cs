@@ -2,7 +2,7 @@
 
 public static class Converters
 {
-    public static LinearGradientBrush ConvertBackground(string s)
+    public static LinearGradientBrush ConvertBackground(string? s)
     {
         if (string.IsNullOrEmpty(s)) 
             return new LinearGradientBrush(new GradientStopCollection() { new(Colors.Red, 0.0f) }, new Point(0, 0), new Point(1, 1));

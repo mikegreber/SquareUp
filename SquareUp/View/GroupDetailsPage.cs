@@ -18,16 +18,15 @@ public class GroupDetailsPage : BaseContentPage<GroupDetailsViewModel>
     {
         await Shell.Current.GoToAsync(state:
             nameof(GroupDetailsPage),
-            animate: false,
+            animate: true,
             parameters: GroupDetailsViewModel.Params(group, mode, title));
     }
 
-    private enum Row { First }
-    private enum Column { Left, Middle, Right }
-
     public GroupDetailsPage(GroupDetailsViewModel viewModel) : base(viewModel)
     {
-        ShowAppBar = false;
+        BackButton = "< Groups";
+
+        this.Bind(TitleProperty, nameof(BindingContext.Title));
 
         Content = new ScrollView
         {
@@ -35,41 +34,6 @@ public class GroupDetailsPage : BaseContentPage<GroupDetailsViewModel>
             {
                 Children =
                 {
-                    new Grid
-                        {
-                            ColumnDefinitions = Columns.Define(
-                                (Column.Left, 55),
-                                (Column.Middle, GridLength.Star),
-                                (Column.Right, 55)
-                            ),
-
-                            RowDefinitions = Rows.Define((Row.First, 56)),
-
-                            Children =
-                            {
-                                new Label()
-                                    .Bind(Label.TextProperty, nameof(BindingContext.Title))
-                                    .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.White))
-                                    .Font(size: 18, bold: true)
-                                    .CenterHorizontal()
-                                    .CenterVertical()
-                                    .Column(Column.Middle),
-
-                                new Image()
-                                    .Source("close_white.png")
-                                    .Size(20)
-                                    .End()
-                                    .BindTapGesture(nameof(BindingContext.BackCommand))
-                                    .Column(Column.Right),
-                            },
-                        }
-                        .Height(56)
-                        .Padding(16,0)
-                        .Margin(0)
-                        .FillHorizontal()
-                        .Bind<Grid, string, Brush>(BackgroundProperty, "Group.Color", convert: Converters.ConvertBackground),
-
-
                     new Label()
                         .Text("Name")
                         .FillHorizontal()
@@ -169,8 +133,7 @@ public class GroupDetailsPage : BaseContentPage<GroupDetailsViewModel>
                         .DynamicResource(StyleProperty, nameof(ThemeBase.ButtonDeleteStyle)),
 
                 },
-                BindingContext = BindingContext
-            }
+            }.BindingContext(BindingContext)
         };
     }
 }

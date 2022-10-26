@@ -28,7 +28,6 @@ public partial class GroupDetailsViewModel : BaseViewModel, IQueryAttributable
 
     public GroupDetailsViewModel(ISessionData session) : base(session)
     {
-        AnimateBackTransitions = false;
     }
 
     public async void ApplyQueryAttributes(IDictionary<string, object> query)
@@ -76,7 +75,7 @@ public partial class GroupDetailsViewModel : BaseViewModel, IQueryAttributable
     private async Task CreateGroup()
     {
         var result = await Session.CreateGroup(Group);
-        await Shell.Current.GoToAsync("..", false);
+        await Shell.Current.GoToAsync("..");
         if (result.Success)
         {
             await GroupPage.OpenAsync(result.Data);
@@ -87,7 +86,7 @@ public partial class GroupDetailsViewModel : BaseViewModel, IQueryAttributable
     private async Task UpdateGroup()
     {
         await Session.UpdateGroup(new GroupRequest{ GroupId = Group.Id, Name = Group.Name, Color = Group.Color });
-        await Shell.Current.GoToAsync("..", false);
+        await Shell.Current.GoToAsync("..");
     }
 
     [RelayCommand]
@@ -98,7 +97,7 @@ public partial class GroupDetailsViewModel : BaseViewModel, IQueryAttributable
         if (confirm)
         {
             await Session.DeleteGroup(Group);
-            await Shell.Current.GoToAsync("../..", false);
+            await Shell.Current.GoToAsync("../..");
         }
     }
 

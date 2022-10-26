@@ -12,8 +12,7 @@ public class SettlementListItemTemplate : DataTemplate
     public SettlementListItemTemplate(IRelayCommand<Settlement> onTap = null) :
         base(() => new SettlementListItem().Bind(SettlementListItem.SettlementProperty)
             .Bind(SettlementListItem.CommandProperty, source: onTap))
-    {
-    }
+    { }
 }
 
 public class SettlementListItem : ContentView

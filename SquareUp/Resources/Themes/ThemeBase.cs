@@ -1,4 +1,6 @@
-﻿namespace SquareUp.Resources.Themes;
+﻿using CommunityToolkit.Maui.Markup;
+
+namespace SquareUp.Resources.Themes;
 
 public abstract class ThemeBase : ResourceDictionary
 {
@@ -59,7 +61,7 @@ public abstract class ThemeBase : ResourceDictionary
         Add(nameof(PlaceholderTextColor), PlaceholderTextColor);
         Add(nameof(DividerColor), DividerColor);
 
-        Add(ShellStyle); 
+        //Add(ShellStyle); 
         Add(EntryStyle);
         Add(nameof(ButtonCreateStyle), ButtonCreateStyle);
         Add(nameof(CategoryHeaderStyle), CategoryHeaderStyle);
@@ -69,7 +71,11 @@ public abstract class ThemeBase : ResourceDictionary
         Add(nameof(ButtonUpdateStyle), ButtonUpdateStyle);
         Add(nameof(ButtonUpdateDisabledStyle), ButtonUpdateDisabledStyle);
         Add(nameof(AltButtonStyle), AltButtonStyle);
+        Add(NavStyle);
+
     }
+
+    public static Style NavStyle { get; } = new Style<NavigationPage>((NavigationPage.BarBackgroundColorProperty, Colors.Pink )).ApplyToDerivedTypes(true);
 
     public static Color Primary => Color.FromArgb("#512BD4");
     public static Color Secondary => Color.FromArgb("#DFD8F7");
@@ -113,7 +119,7 @@ public abstract class ThemeBase : ResourceDictionary
     public static SolidColorBrush Gray600Brush => new(Gray600);
     public static SolidColorBrush Gray900Brush => new(Gray900);
     public static SolidColorBrush Gray950Brush => new(Gray950);
-    public abstract Style ShellStyle { get; }
+    //public abstract Style ShellStyle { get; }
     public abstract Style EntryStyle { get; }
     public abstract Style ButtonCreateStyle { get; }
     public abstract Style ButtonCreateDisabledStyle { get; }

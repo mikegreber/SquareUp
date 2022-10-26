@@ -4,14 +4,14 @@ namespace SquareUp.Resources.Themes;
 
 public class LightTheme : ThemeBase
 {
-    public override Style ShellStyle { get; } = new Style<Shell>(
-        (Shell.NavBarHasShadowProperty, true),
-        (Shell.TitleColorProperty, Colors.Black),
-        (Shell.DisabledColorProperty, Colors.Black),
-        (Shell.UnselectedColorProperty, Colors.Black),
-        (Shell.ForegroundColorProperty, Colors.Black),
-        (Shell.BackgroundColorProperty, Blue100Accent))
-        .ApplyToDerivedTypes(true);
+    // public override Style ShellStyle { get; } = new Style<Shell>(
+    //     (Shell.NavBarHasShadowProperty, true),
+    //     (Shell.TitleColorProperty, Colors.Black),
+    //     (Shell.DisabledColorProperty, Colors.Black),
+    //     (Shell.UnselectedColorProperty, Colors.Black),
+    //     (Shell.ForegroundColorProperty, Colors.Black),
+    //     (Shell.BackgroundColorProperty, Blue100Accent))
+    //     .ApplyToDerivedTypes(true);
 
     public override Style EntryStyle { get; } = new Style<Entry>(
             (Entry.TextProperty, Gray950)

@@ -17,15 +17,9 @@ public class GroupsPage : BaseContentPage<GroupsViewModel>
     }
     public GroupsPage(GroupsViewModel viewModel) : base(in viewModel)
     {
-        BackView = new Label()
-            .Text("< Sign Out")
-            .Font(size:14)
-            .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.PrimaryTextColor));
-        TitleView = new Label()
-            .Text("Groups")
-            .Font(size:18)
-            .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.PrimaryTextColor));
-
+        Title = "Groups";
+        BackButton = "< Sign Out";
+        
         Content = new ScrollView
         {
             Content = new CollectionView
@@ -44,9 +38,9 @@ public class GroupsPage : BaseContentPage<GroupsViewModel>
                 .Margin(0)
                 .Font(bold: true)
                 .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.PrimaryTextColor))
-                .Bind<Label, DateTime, string>(Label.TextProperty, "Key", convert: d => d.ToLongDateString()))
+                .Bind<Label, DateTime, string>(Label.TextProperty, "Key", convert: d => d.ToLongDateString().ToUpper()))
             }
-            .Margin(new Thickness(0, -24, 0, 72))
+            .Margin(new Thickness(0, 0, 0, 72))
             .Bind(ItemsView.ItemsSourceProperty, "Session.Groups")
             .ItemTemplate(new GroupCardTemplate(BindingContext.GroupTapCommand)),
         }

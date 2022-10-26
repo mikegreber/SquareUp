@@ -17,14 +17,9 @@ public class DebtsPage : BaseContentPage<DebtsViewModel>
     }
     public DebtsPage(DebtsViewModel viewModel) : base(in viewModel)
     {
-        BackView = new Label()
-            .Text("< Groups")
-            .Font(size: 14)
-            .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.PrimaryTextColor));
-        TitleView = new Label()
-            .Text("Debts")
-            .Font(size: 18)
-            .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.PrimaryTextColor));
+        Title = "Debts";
+        BackButton = "< Group";
+
         Content = new ScrollView
         {
             Content = new VerticalStackLayout

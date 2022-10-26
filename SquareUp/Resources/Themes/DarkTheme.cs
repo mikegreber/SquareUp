@@ -4,14 +4,14 @@ namespace SquareUp.Resources.Themes;
 
 public class DarkTheme : ThemeBase
 {
-    public override Style ShellStyle { get; } = new Style<Shell>(
-        (Shell.NavBarHasShadowProperty, true),
-        (Shell.TitleColorProperty, Colors.White),
-        (Shell.DisabledColorProperty, Colors.White),
-        (Shell.UnselectedColorProperty, Colors.White),
-        (Shell.ForegroundColorProperty, Colors.White),
-        (Shell.BackgroundColorProperty, Black))
-        .ApplyToDerivedTypes(true);
+    // public override Style ShellStyle { get; } = new Style<Shell>(
+    //     (Shell.NavBarHasShadowProperty, false),
+    //     (Shell.TitleColorProperty, Colors.White),
+    //     (Shell.DisabledColorProperty, Colors.White),
+    //     (Shell.UnselectedColorProperty, Colors.White),
+    //     (Shell.ForegroundColorProperty, Colors.White),
+    //     (Shell.BackgroundColorProperty, Colors.Blue))
+    //     .ApplyToDerivedTypes(true);
 
     public override Style EntryStyle { get; } = new Style<Entry>(
         (Entry.TextColorProperty, Gray50),

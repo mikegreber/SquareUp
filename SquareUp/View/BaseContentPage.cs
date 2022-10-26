@@ -1,11 +1,16 @@
-﻿using CommunityToolkit.Maui.Markup;
+﻿using System.Windows.Input;
+using CommunityToolkit.Maui.Markup;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.Maui.Controls.PlatformConfiguration;
 using Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;
 using Microsoft.Maui.Layouts;
 using SquareUp.Controls;
+using SquareUp.Model;
 using SquareUp.Resources.Themes;
 using SquareUp.ViewModel;
+using Application = Microsoft.Maui.Controls.Application;
 using MauiView = Microsoft.Maui.Controls.View;
+using NavigationPage = Microsoft.Maui.Controls.NavigationPage;
 using VisualElement = Microsoft.Maui.Controls.VisualElement;
 
 namespace SquareUp.View;
@@ -21,55 +26,118 @@ public abstract class BaseContentPage : ContentPage
     }
 }
 
-public abstract class BaseContentPage<T> : BaseContentPage where T : BaseViewModel
+public abstract partial class BaseContentPage<T> : BaseContentPage where T : BaseViewModel
 {
+    private enum Row
+    {
+        First
+    }
+
+    private enum Column
+    {
+        Back,
+        Title,
+        Action
+    }
+
     protected BaseContentPage(in T viewModel, in bool shouldUseSafeArea = false) : base(shouldUseSafeArea)
     {
+
         base.BindingContext = viewModel;
 
         this.DynamicResource(BackgroundColorProperty, nameof(ThemeBase.PageBackgroundColor));
 
-        Shell.SetBackButtonBehavior(this, new BackButtonBehavior{IsVisible = false});
     }
 
-    protected MauiView ActionView { get; set; } = new Label();
-    protected MauiView TitleView { get; set; } = new Label();
-    protected MauiView BackView { get; set; } = new Label();
-    protected bool ShowAppBar { get; set; } = true;
+#if (WINDOWS)
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+        
+        Shell.SetBackButtonBehavior(this, new BackButtonBehavior()
+        {
+            IsVisible = false,
+        });
+    }
+#endif
+#if WINDOWS
+    protected override void OnSizeAllocated(double width, double height)
+    {
+        base.OnSizeAllocated(width, height);
+
+        Shell.SetTitleView(this, new Grid
+            {
+                BackgroundColor = BackgroundColor,
+                WidthRequest = width,
+
+#if WINDOWS
+                HeightRequest = 40,
+                Padding = new Thickness(16,0),
+#elif ANDROID
+                HeightRequest = 56,
+                Padding = new Thickness(0,0,64,0),
+#endif
+
+                ColumnDefinitions = GridRowsColumns.Columns.Define(
+                    (Column.Back, GridLength.Star),
+                    (Column.Title, GridLength.Star),
+                    (Column.Action, GridLength.Star)
+                ),
+
+                RowDefinitions = GridRowsColumns.Rows.Define((Row.First, 40)),
+
+                Children =
+                {
+                    new Label()
+                        .Bind(source: BackButton)
+                        .BindTapGesture(nameof(BindingContext.BackCommand))
+                        .Start()
+                        .CenterVertical()
+                        .Column(Column.Back)
+                        .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.PrimaryTextColor))
+                        .BindingContext(BindingContext),
+
+                    new Label()
+                        .Font(size:16, bold: true)
+                        .CenterVertical()
+                        .CenterHorizontal()
+                        .Bind(nameof(Title))
+                        .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.PrimaryTextColor))
+                        .Column(Column.Back, Column.Action),
+
+                    new Image()
+                        .End()
+                        .CenterVertical()
+                        .Bind(Image.SourceProperty, source: AppBarActionButtonIconSource)
+                        .BindTapGesture(nameof(AppBarActionCommand))
+                        .Column(Column.Action)
+                        .BindingContext(this)
+                }
+            }
+            .BindingContext(this));
+    }
+#endif
+    protected string BackButton { get; set; } = string.Empty;
+    protected string AppBarActionButtonIconSource { get; set; } = string.Empty;
+
+    public IRelayCommand AppBarActionCommand { get; set; } = new RelayCommand(()=>{});
 
     protected new MauiView Content
     {
         get => base.Content;
         set
         {
-            BackView
-                .CenterVertical()
-                .Start()
-                .BindTapGesture(nameof(BindingContext.BackCommand))
-                .BindingContext(BindingContext);
-            TitleView
-                .CenterVertical()
-                .CenterHorizontal();
-            ActionView
-                .CenterVertical()
-                .End();
-            
-            InnerContent = value;
-            if (ShowAppBar) InnerContent.Margin += new Thickness(0, 56, 0, 0);
-            InnerContent
-                .LayoutBounds(0, 0, 1, 1)
-                .LayoutFlags(AbsoluteLayoutFlags.All)
-                .BindingContext(BindingContext);
-            
+
+#if ANDROID
+            if (!string.IsNullOrEmpty(AppBarActionButtonIconSource) && AppBarActionCommand != null)
+                ToolbarItems.Add(new ToolbarItem("Action", AppBarActionButtonIconSource, () => AppBarActionCommand.Execute(null)));
+#endif
             base.Content = new AbsoluteLayout
                 {
-                    new AppBar(BackView, TitleView, ActionView) { IsVisible = ShowAppBar }
-                        .Bind(AppBar.TitleViewProperty, nameof(TitleView))
-                        .Bind(AppBar.BackViewProperty, nameof(BackView))
-                        .Bind(AppBar.ActionViewProperty, nameof(ActionView))
-                        .LayoutBounds(0, 0, 1, 56).LayoutFlags(AbsoluteLayoutFlags.WidthProportional)
-                        .BindingContext(this),
-                    InnerContent,
+                    value
+                        .LayoutBounds(0, 0, 1, 1)
+                        .LayoutFlags(AbsoluteLayoutFlags.All)
+                        .BindingContext(BindingContext),
                     new ImageButton
                         {
                             BackgroundColor = Colors.DeepPink,
@@ -78,7 +146,7 @@ public abstract class BaseContentPage<T> : BaseContentPage where T : BaseViewMod
                                 { Offset = new Point(0, 10), Brush = new SolidColorBrush(Color.FromRgba(0, 0, 0, 50)) }
                         }
                         .Source("add.png")
-                        .Size(56)
+                        .Size(100)
                         .Padding(16)
                         .Margin(16)
                         .CenterVertical()
@@ -98,9 +166,6 @@ public abstract class BaseContentPage<T> : BaseContentPage where T : BaseViewMod
                 .BindingContext(this);
         }
     }
-
-    protected MauiView InnerContent { get; set; }
-
     protected new T BindingContext => (T)base.BindingContext;
 }
 

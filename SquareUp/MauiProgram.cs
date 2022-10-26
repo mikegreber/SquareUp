@@ -3,7 +3,6 @@ using CommunityToolkit.Maui.Markup;
 using SquareUp.Services.Auth;
 using SquareUp.Services.Transactions;
 using SquareUp.Services.Groups;
-using SquareUp.Services.Navigation;
 using SquareUp.Services.Users;
 using SquareUp.ViewModel;
 using SquareUp.View;
@@ -50,7 +49,6 @@ public static class MauiProgram
         mauiAppBuilder.Services.AddSingleton<IGroupService, GroupService>();
         mauiAppBuilder.Services.AddSingleton<ISessionData, SessionData>();
         mauiAppBuilder.Services.AddSingleton<ITransactionService, TransactionService>();
-        mauiAppBuilder.Services.AddSingleton<INavigationService, NavigationService>();
         
         return mauiAppBuilder;
     }

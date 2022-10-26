@@ -8,30 +8,28 @@ public class LoginPage : BaseContentPage<LoginViewModel>
 {
     public LoginPage(LoginViewModel viewModel) : base(viewModel)
     {
-        TitleView = new Label()
-            .Text("Login")
-            .Font(size:16)
-            .CenterVertical()
-            .CenterHorizontal()
-            .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.PrimaryTextColor));
+        Title = "Login";
 
         Content = new StackLayout
         {
-            Margin = 30,
-            MaximumWidthRequest = 600,
+            MaximumWidthRequest = 400,
             Children =
                     {
                         new Label { Text = "Email" }
                             .Text("Email")
+                            .Margins(bottom:4)
                             .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.SecondaryTextColor)),
                         new Entry { Placeholder = "example@mail.com" }
                             .Bind(Entry.TextProperty, "LoginRequest.Email")
+                            .Margins(bottom:12)
                             .DynamicResource(Entry.TextColorProperty, nameof(ThemeBase.SecondaryTextColor)),
                         
                         new Label { Text = "Password" }
+                            .Margins(bottom:4)
                             .DynamicResource(Label.TextColorProperty,
                             nameof(ThemeBase.SecondaryTextColor)),
                         new Entry{ IsPassword = true, Placeholder = "****" }
+                            .Margins(bottom:24)
                             .Bind(Entry.TextProperty, "LoginRequest.Password"),
                         
                         new Button()
@@ -46,6 +44,6 @@ public class LoginPage : BaseContentPage<LoginViewModel>
                             .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.SecondaryTextColor))
                             .BindTapGesture(nameof(BindingContext.RegisterCommand))
                     }
-        };
+        }.CenterVertical().Margin(30);
     }
 }

@@ -18,10 +18,7 @@ public partial class TransactionViewModel : BaseViewModel, IQueryAttributable
     [ObservableProperty]
     private string _title = string.Empty;
 
-    public TransactionViewModel(ISessionData session) : base(session)
-    {
-        AnimateBackTransitions = false;
-    }
+    public TransactionViewModel(ISessionData session) : base(session) { }
 
     public async void ApplyQueryAttributes(IDictionary<string, object> query)
     {
@@ -55,21 +52,21 @@ public partial class TransactionViewModel : BaseViewModel, IQueryAttributable
         };
 
         await Session.CreateTransaction(Transaction);
-        await Shell.Current.GoToAsync("..", false);
+        await Shell.Current.GoToAsync("..");
     }
 
     [RelayCommand]
     private async Task Update()
     {
         await Session.UpdateTransaction(Transaction);
-        await Shell.Current.GoToAsync("..", false);
+        await Shell.Current.GoToAsync("..");
     }
 
     [RelayCommand]
     private async Task Delete()
     {
         await Session.DeleteTransaction(Transaction);
-        await Shell.Current.GoToAsync("..", false);
+        await Shell.Current.GoToAsync("..");
     }
 }
 

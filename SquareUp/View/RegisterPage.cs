@@ -8,55 +8,53 @@ public class RegisterPage : BaseContentPage<RegisterViewModel>
 {
     public RegisterPage(RegisterViewModel viewModel) : base(viewModel)
     {
-        BackView = new Label()
-            .Text("< Login")
-            .Font(size: 14)
-            .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.PrimaryTextColor));
-
-        TitleView = new Label()
-            .Text("Register")
-            .Font(size: 16)
-            .CenterVertical()
-            .CenterHorizontal()
-            .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.PrimaryTextColor));
+        Title = "Register";
+        BackButton = "< Login";
 
         Content = new StackLayout
         {
-            Margin = 30,
             MaximumWidthRequest = 600,
             Children =
             {
                 new Label()
                     .Text("Name")
+                    .Margins(bottom:4)
                     .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.SecondaryTextColor)),
                 new Entry { Placeholder = "name..." }
+                    .Margins(bottom:12)
                     .Bind(Entry.TextProperty, "RegisterRequest.Name"),
 
                 new Label()
                     .Text("Email")
+                    .Margins(bottom:4)
                     .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.SecondaryTextColor)),
                 new Entry { Placeholder = "example@mail.com..." }
+                    .Margins(bottom:12)
                     .Bind(Entry.TextProperty, "RegisterRequest.Email"),
 
-                new Label() 
+                new Label()
                     .Text("Password")
+                    .Margins(bottom:4)
                     .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.SecondaryTextColor)),
                 new Entry { IsPassword = true, Placeholder = "****" }
+                    .Margins(bottom:12)
                     .Bind(Entry.TextProperty, "RegisterRequest.Password"),
 
                 new Label()
                     .Text("Confirm password")
+                    .Margins(bottom:4)
                     .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.SecondaryTextColor)),
                 new Entry{ IsPassword = true, Placeholder = "****" }
+                    .Margins(bottom:24)
                     .Bind(Entry.TextProperty, "RegisterRequest.ConfirmPassword"),
 
                 new Button()
-                    .Margins(top: 30, bottom: 30)
                     .Text("Register")
+                    .Margins(bottom: 30)
                     .BindCommand(nameof(BindingContext.RegisterCommand))
                     .DynamicResource(StyleProperty, nameof(ThemeBase.ButtonCreateStyle))
             }
-        };
+        }.CenterVertical().Margin(30);
     }
 
     public static async Task OpenAsync()

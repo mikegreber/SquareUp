@@ -5,7 +5,10 @@ namespace SquareUp;
 
 public class App : Application
 {
-    
+
+    enum Row { First }
+
+    enum Column { Back, Title, Action }
 
     public App(LoginPage loginPage)
     {
