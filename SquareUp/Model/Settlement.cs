@@ -1,8 +1,15 @@
-﻿namespace SquareUp.Model;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 
-public class Settlement
+namespace SquareUp.Model;
+
+public partial class Settlement : ObservableObject
 {
-    public ObservableParticipant From { get; set; }
-    public ObservableParticipant To { get; set; }
-    public decimal Amount { get; set; }
+    [ObservableProperty]
+    private ObservableParticipant _from;
+
+    [ObservableProperty]
+    private ObservableParticipant _to;
+
+    [ObservableProperty]
+    private decimal _amount;
 }

@@ -6,6 +6,7 @@ using SquareUp.Controls;
 using SquareUp.Library;
 using SquareUp.Model;
 using SquareUp.Resources.Themes;
+using SquareUp.Shared.Types;
 using SquareUp.ViewModel;
 using static CommunityToolkit.Maui.Markup.GridRowsColumns;
 using Animation = Microsoft.Maui.Controls.Animation;
@@ -64,6 +65,7 @@ public class GroupDetailsPage : BaseContentPage<GroupDetailsViewModel>
 
                     new CollectionView()
                         .Bind(ItemsView.ItemsSourceProperty, "Group.Participants")
+                        .Bind<CollectionView, FullyObservableCollection<ObservableParticipant>, double>(CollectionView.HeightRequestProperty, "Group.Participants", convert: p => p != null ? ParticipantListItem.ItemHeight * p.Count : 0.0)
                         .Bind(ParticipantListItem.ParticipantProperty)
                         .Bind<CollectionView, PageMode, bool>(IsEnabledProperty, nameof(BindingContext.Mode), convert: mode => mode == PageMode.Edit)
                         .Bind<CollectionView, PageMode, bool>(IsVisibleProperty, nameof(BindingContext.Mode), convert: mode => mode == PageMode.Edit)
@@ -93,21 +95,24 @@ public class GroupDetailsPage : BaseContentPage<GroupDetailsViewModel>
                         Orientation = ScrollOrientation.Horizontal,
                         Content = new CollectionView
                             {
-                                ItemsLayout = new GridItemsLayout(5, ItemsLayoutOrientation.Vertical),
-                                ItemSizingStrategy = ItemSizingStrategy.MeasureFirstItem,
+                                
+                                //ItemsLayout = new GridItemsLayout(5, ItemsLayoutOrientation.Vertical),
+                                ItemsLayout = new LinearItemsLayout(ItemsLayoutOrientation.Horizontal) { ItemSpacing = 5 },
+                                //ItemSizingStrategy = ItemSizingStrategy.MeasureFirstItem,
                                 HorizontalScrollBarVisibility = ScrollBarVisibility.Never,
                                 VerticalScrollBarVisibility = ScrollBarVisibility.Never,
                                 SelectionMode = SelectionMode.Single
                             }
                             .Start()
+                            .Height(50)
+                            .Margin(8)
                             .Bind(ItemsView.ItemsSourceProperty, source: ThemeBase.GroupColors)
                             .Bind(SelectableItemsView.SelectedItemProperty, "Group.Color")
                             .ItemTemplate(new DataTemplate(() => new Ellipse()
-                                .Size(40)
-                                .Margin(5)
+                                .Size(50)
                                 .CenterHorizontal()
-                                .Bind<Ellipse, string, Brush>(Shape.FillProperty, convert: Converters.ConvertBackground)))
-                    }.Paddings(8,4,8),
+                                .Bind<Ellipse, string, Brush>(Shape.FillProperty, convert: Converters.ConvertBackground))),
+                    },
 
                     new Button()
                         .Text("Create Group")

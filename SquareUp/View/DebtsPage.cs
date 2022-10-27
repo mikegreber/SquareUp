@@ -1,7 +1,9 @@
-﻿using CommunityToolkit.Maui.Markup;
+﻿using System.Collections.ObjectModel;
+using CommunityToolkit.Maui.Markup;
 using SquareUp.Controls;
 using SquareUp.Model;
 using SquareUp.Resources.Themes;
+using SquareUp.Shared.Types;
 using SquareUp.ViewModel;
 
 namespace SquareUp.View;
@@ -24,12 +26,12 @@ public class DebtsPage : BaseContentPage<DebtsViewModel>
         {
             Content = new VerticalStackLayout
             {
-                BindingContext = BindingContext,
                 Children =
                 {
                     new CollectionView()
-                        .Margin(new Thickness(16, 0, 16, 16))
+                        .Margins(16, 0, 16, 16)
                         .Bind(ItemsView.ItemsSourceProperty, "Debts")
+                        .Bind<CollectionView, FullyObservableCollection<Debt>, double>(CollectionView.HeightRequestProperty, "Debts", convert: d => d != null ? DebtListItem.ItemHeight * d.Count : 0.0)
                         .ItemTemplate(new DebtListItemTemplate()),
 
                     new Label()
@@ -40,10 +42,11 @@ public class DebtsPage : BaseContentPage<DebtsViewModel>
 
                     new CollectionView()
                         .Margins(16, 0, 16, 16)
+                        .Bind<CollectionView, FullyObservableCollection<Settlement>, double>(CollectionView.HeightRequestProperty, "Settlements", convert: d => d != null ? SettlementListItem.ItemHeight * d.Count : 200)
                         .Bind(ItemsView.ItemsSourceProperty, "Settlements")
                         .ItemTemplate(new SettlementListItemTemplate(BindingContext.SettleCommand))
                 }
-            }
+            }.BindingContext(BindingContext)
         };
     }
 }

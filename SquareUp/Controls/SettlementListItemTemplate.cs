@@ -32,41 +32,38 @@ public class SettlementListItem : ContentView
         defaultBindingMode: BindingMode.OneWay
     );
 
+    public static double ItemHeight = 50;
+
     public SettlementListItem()
     {
-        Content = new VerticalStackLayout
+        Content = new Grid
         {
+            ColumnDefinitions = Columns.Define((Column.First, Stars(3)), (Column.Second, Star)),
+            RowDefinitions = Rows.Define((Row.First, ItemHeight)),
+
             Children =
-            {
-                new Grid
                 {
-                    ColumnDefinitions = Columns.Define((Column.First, Stars(3)), (Column.Second, Star)),
-                    RowDefinitions = Rows.Define((Row.First, 50)),
+                    new Label()
+                        .Bind<Label, Settlement, string>(convert: s => s != null ? $"{s.From.Name} pays ${s.Amount:0.00} to {s.To.Name}" : "")
+                        .CenterVertical()
+                        .Column(Column.First)
+                        .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.PrimaryTextColor)),
 
-                    Children =
-                    {
-                        new Label()
-                            .Bind<Label, Settlement, string>(convert: s => s != null ? $"{s.From.Name} pays ${s.Amount:0.00} to {s.To.Name}" : "")
-                            .CenterVertical()
-                            .Column(Column.First)
-                            .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.PrimaryTextColor)),
+                    new Button()
+                        .Text("Settle")
+                        .FillHorizontal()
+                        .CenterVertical()
+                        .Column(Column.Second)
+                        .BindCommand(nameof(Command), parameterPath: nameof(Settlement))
+                        .DynamicResource(StyleProperty, nameof(ThemeBase.AltButtonStyle))
+                        .BindingContext(this),
 
-                        new Button()
-                            .Text("Settle")
-                            .FillHorizontal()
-                            .CenterVertical()
-                            .Column(Column.Second)
-                            .BindCommand(nameof(Command), parameterPath: nameof(Settlement))
-                            .DynamicResource(StyleProperty, nameof(ThemeBase.AltButtonStyle))
-                            .BindingContext(this)
-                    }
-                },
-
-                new BoxView()
-                    .Height(1)
-                    .FillHorizontal()
-                    .DynamicResource(BoxView.ColorProperty, nameof(ThemeBase.DividerColor))
-            }
+                    new BoxView() { VerticalOptions = LayoutOptions.End }
+                        .Column(Column.First, Column.Second)
+                        .Height(1)
+                        .FillHorizontal()
+                        .DynamicResource(BoxView.ColorProperty, nameof(ThemeBase.DividerColor))
+                }
         };
     }
 

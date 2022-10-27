@@ -64,29 +64,23 @@ public class ParticipantListItem : BaseContentView<GroupDetailsViewModel>
         set => SetValue(UserIdProperty, value);
     }
 
-
+    public static double ItemHeight = 50;
+    
     public ParticipantListItem(GroupDetailsViewModel viewModel) : base(viewModel)
     {
-        Content = new VerticalStackLayout
-        {
-            Padding = new Thickness(16, 0),
-
-            BindingContext = this,
-            Children =
-            {
-                new Grid
+        Content = new Grid
                 {
                     ColumnDefinitions = Columns.Define((Column.First, Stars(3)), (Column.Second, Star)),
-                    RowDefinitions = Rows.Define((Row.First, 50)),
+                    RowDefinitions = Rows.Define((Row.First, ItemHeight)),
 
                     Children =
                     {
                         new Label()
-                        .FillHorizontal()
-                        .CenterVertical()
-                        .Column(Column.First)
-                        .Bind("Participant.Name")
-                        .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.PrimaryTextColor)),
+                            .FillHorizontal()
+                            .CenterVertical()
+                            .Column(Column.First)
+                            .Bind("Participant.Name")
+                            .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.PrimaryTextColor)),
 
                         new Button()
                             .Text("Invite")
@@ -113,16 +107,15 @@ public class ParticipantListItem : BaseContentView<GroupDetailsViewModel>
                             .Bind<Label, int, bool>(IsVisibleProperty, "Participant.UserId",
                                 convert: i => i == UserId)
                             .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.Blue100Accent))
-                            .Column(Column.Second)
-                    }
-                },
+                            .Column(Column.Second),
 
-                new BoxView()
-                    .Height(1)
-                    .FillHorizontal()
-                    .DynamicResource(BoxView.ColorProperty, nameof(ThemeBase.DividerColor))
-            }
-        };
+                        new BoxView() { VerticalOptions = LayoutOptions.End }
+                            .Column(Column.First, Column.Second)
+                            .Height(1)
+                            .FillHorizontal()
+                            .DynamicResource(BoxView.ColorProperty, nameof(ThemeBase.DividerColor))
+                    }
+        }.Padding(20,0).BindingContext(this);
     }
 
     private enum Column

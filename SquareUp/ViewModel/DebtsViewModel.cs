@@ -20,7 +20,7 @@ public partial class DebtsViewModel : BaseViewModel, IQueryAttributable
     private FullyObservableCollection<Debt> _debts = new();
 
     [ObservableProperty] 
-    private ObservableCollection<Settlement> _settlements = new();
+    private FullyObservableCollection<Settlement> _settlements = new();
 
     public DebtsViewModel(ISessionData session) : base(session)
     { }
@@ -70,7 +70,7 @@ public partial class DebtsViewModel : BaseViewModel, IQueryAttributable
             .ToList();
         owed.Sort((a,b) => b.Amount.CompareTo(a.Amount));
 
-        Settlements.Clear();
+        var settlements = new List<Settlement>();
         while (owing.Count > 0 && owed.Count > 0)
         {
             var settlement = new Settlement { From = owing.First().Participant, To = owed.First().Participant };
@@ -96,11 +96,11 @@ public partial class DebtsViewModel : BaseViewModel, IQueryAttributable
 
             if (settlement.Amount > 0.1m)
             {
-                Settlements.Add(settlement);
+                settlements.Add(settlement);
             }
         }
 
-
+        Settlements = new FullyObservableCollection<Settlement>(settlements);
     }
 
     [RelayCommand]

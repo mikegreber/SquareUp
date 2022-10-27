@@ -46,21 +46,20 @@ public abstract partial class BaseContentPage<T> : BaseContentPage where T : Bas
         base.BindingContext = viewModel;
 
         this.DynamicResource(BackgroundColorProperty, nameof(ThemeBase.PageBackgroundColor));
-
     }
 
-#if (WINDOWS)
+#if WINDOWS
     protected override void OnAppearing()
     {
         base.OnAppearing();
-        
+        //Shell.SetTitleColor(this,Colors.OrangeRed);
+
         Shell.SetBackButtonBehavior(this, new BackButtonBehavior()
         {
             IsVisible = false,
         });
     }
-#endif
-#if WINDOWS
+
     protected override void OnSizeAllocated(double width, double height)
     {
         base.OnSizeAllocated(width, height);
@@ -70,13 +69,8 @@ public abstract partial class BaseContentPage<T> : BaseContentPage where T : Bas
                 BackgroundColor = BackgroundColor,
                 WidthRequest = width,
 
-#if WINDOWS
                 HeightRequest = 40,
                 Padding = new Thickness(16,0),
-#elif ANDROID
-                HeightRequest = 56,
-                Padding = new Thickness(0,0,64,0),
-#endif
 
                 ColumnDefinitions = GridRowsColumns.Columns.Define(
                     (Column.Back, GridLength.Star),
@@ -117,10 +111,19 @@ public abstract partial class BaseContentPage<T> : BaseContentPage where T : Bas
             .BindingContext(this));
     }
 #endif
+
     protected string BackButton { get; set; } = string.Empty;
+
     protected string AppBarActionButtonIconSource { get; set; } = string.Empty;
 
     public IRelayCommand AppBarActionCommand { get; set; } = new RelayCommand(()=>{});
+
+#if MACCATALYST || IOS || ANDROID
+    private int ActionButtonSize = 96;
+#else
+    private int ActionButtonSize = 56;
+#endif
+
 
     protected new MauiView Content
     {
@@ -128,10 +131,19 @@ public abstract partial class BaseContentPage<T> : BaseContentPage where T : Bas
         set
         {
 
-#if ANDROID
+#if !WINDOWS
+            Shell.SetBackButtonBehavior(this, new BackButtonBehavior()
+            {
+                IsVisible = true,
+                TextOverride = BackButton
+            });
+
             if (!string.IsNullOrEmpty(AppBarActionButtonIconSource) && AppBarActionCommand != null)
+            {
                 ToolbarItems.Add(new ToolbarItem("Action", AppBarActionButtonIconSource, () => AppBarActionCommand.Execute(null)));
+            }
 #endif
+
             base.Content = new AbsoluteLayout
                 {
                     value
@@ -141,13 +153,13 @@ public abstract partial class BaseContentPage<T> : BaseContentPage where T : Bas
                     new ImageButton
                         {
                             BackgroundColor = Colors.DeepPink,
-                            CornerRadius = 28,
+                            CornerRadius = ActionButtonSize>>1,
                             Shadow = new Shadow
                                 { Offset = new Point(0, 10), Brush = new SolidColorBrush(Color.FromRgba(0, 0, 0, 50)) }
                         }
                         .Source("add.png")
-                        .Size(100)
-                        .Padding(16)
+                        .Size(ActionButtonSize)
+                        .Padding(ActionButtonSize/3.5)
                         .Margin(16)
                         .CenterVertical()
                         .CenterHorizontal()

@@ -20,19 +20,16 @@ public class DebtListItem : ContentView
         typeof(DebtListItem)
     );
 
+    public static double ItemHeight = 50;
 
     public DebtListItem()
     {
-        Content = new VerticalStackLayout
+        Content = new Grid
         {
-            Children =
-            {
-                new Grid
-                {
-                    ColumnDefinitions = Columns.Define((Column.First, Star), (Column.Second, Star)),
-                    RowDefinitions = Rows.Define((Row.First, 50)),
+            ColumnDefinitions = Columns.Define((Column.First, Star), (Column.Second, Star)),
+            RowDefinitions = Rows.Define((Row.First, ItemHeight)),
 
-                    Children =
+            Children =
                     {
                         new Label()
                             .Bind("Participant.Name")
@@ -58,14 +55,13 @@ public class DebtListItem : ContentView
                                 _ => "square",
                             })
                             .Column(Column.Second),
-                    }
-                },
 
-                new BoxView()
-                    .Height(1)
-                    .FillHorizontal()
-                    .DynamicResource(BoxView.ColorProperty, nameof(ThemeBase.DividerColor))
-            }
+                        new BoxView() { VerticalOptions = LayoutOptions.End }
+                            .Height(1)
+                            .Column(Column.First, Column.Second)
+                            .FillHorizontal()
+                            .DynamicResource(BoxView.ColorProperty, nameof(ThemeBase.DividerColor))
+                    }
         };
     }
 

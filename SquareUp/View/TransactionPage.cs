@@ -5,6 +5,7 @@ using SquareUp.Model;
 using SquareUp.Resources.Statics;
 using SquareUp.Resources.Themes;
 using SquareUp.Shared.Models;
+using SquareUp.Shared.Types;
 using SquareUp.ViewModel;
 using static CommunityToolkit.Maui.Markup.GridRowsColumns;
 using static SquareUp.Resources.Statics.TransactionCategories;
@@ -54,18 +55,21 @@ public class TransactionPage : BaseContentPage<TransactionViewModel>
                         .Bind<Label, string, string>("Transaction.Participant.Name", convert: name => name != null ? $"Paid by {name}" : "Paid by")
                         .DynamicResource(StyleProperty, nameof(ThemeBase.CategoryHeaderStyle)),
 
-                    new CollectionView { SelectionMode = SelectionMode.Single, }
-                        .Bind(SelectableItemsView.SelectedItemProperty, "Transaction.Participant")
-                        .Bind(ItemsView.ItemsSourceProperty, "Session.Group.Participants")
-                        .FillHorizontal()
-                        .ItemTemplate(new DataTemplate(() => new Label()
-                            .Bind("Name")
-                            .Margin(16,0)
-                            .Padding(0)
-                            .Start()
+                    new CollectionView { SelectionMode = SelectionMode.Single }
+                            .Bind(SelectableItemsView.SelectedItemProperty, "Transaction.Participant")
+                            .Bind(ItemsView.ItemsSourceProperty, "Session.Group.Participants")
+                            .Bind<CollectionView, FullyObservableCollection<ObservableParticipant>, int>(CollectionView.HeightRequestProperty, "Session.Group.Participants", convert: p => p != null ? p.Count * 40 : 100 )
                             .FillHorizontal()
-                            .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.SecondaryTextColor))
-                        )),
+                            .ItemTemplate(new DataTemplate(() => new Label()
+                                .Bind("Name")
+                                .Height(40)
+                                .TextCenterVertical()
+                                .Padding(20,0)
+                                .Start()
+                                .FillHorizontal()
+                                .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.SecondaryTextColor))
+                            )),
+
 
                     new Label()
                         .Text("Category")
@@ -74,13 +78,13 @@ public class TransactionPage : BaseContentPage<TransactionViewModel>
 
                     new CollectionView
                         {
-                            ItemsUpdatingScrollMode = ItemsUpdatingScrollMode.KeepItemsInView,
                             ItemsLayout = new GridItemsLayout(4, ItemsLayoutOrientation.Vertical),
                             SelectionMode = SelectionMode.Single,
                             ItemsSource = TransactionCategories.All,
                         }
-                        .Margin(16,0)
                         .Bind(SelectableItemsView.SelectedItemProperty, "Transaction.Category")
+                        .Bind<CollectionView, IReadOnlyCollection<string>, double>(CollectionView.HeightRequestProperty, source: TransactionCategories.All, convert: s => s != null ? (Math.Ceiling(s.Count/4.0) * CategoryGridItem.ItemHeight) : 100 )
+                        .Margin(16,0)
                         .FillHorizontal()
                         .ItemTemplate(new CategoryGridItemTemplate()),
 
@@ -90,19 +94,21 @@ public class TransactionPage : BaseContentPage<TransactionViewModel>
                         .Bind<Label, string, bool>(IsVisibleProperty, "Transaction.Category", convert: type => type == Transfer)
                         .DynamicResource(StyleProperty, nameof(ThemeBase.CategoryHeaderStyle)),
 
-                    new CollectionView { SelectionMode = SelectionMode.Single, }
-                        .Bind(SelectableItemsView.SelectedItemProperty, "Transaction.SecondaryParticipant")
-                        .Bind(ItemsView.ItemsSourceProperty, "Session.Group.Participants")
-                        .Bind<CollectionView, string, bool>(IsVisibleProperty, "Transaction.Category", convert: type => type == Transfer)
-                        .FillHorizontal()
-                        .ItemTemplate(new DataTemplate(() => new Label()
-                            .Bind("Name")
-                            .Margin(16,0)
-                            .Padding(0)
-                            .Start()
+                    new CollectionView { SelectionMode = SelectionMode.Single }
+                            .Bind(SelectableItemsView.SelectedItemProperty, "Transaction.SecondaryParticipant")
+                            .Bind(ItemsView.ItemsSourceProperty, "Session.Group.Participants")
+                            .Bind<CollectionView, string, bool>(IsVisibleProperty, "Transaction.Category", convert: type => type == Transfer)
+                            .Bind<CollectionView, FullyObservableCollection<ObservableParticipant>, int>(CollectionView.HeightRequestProperty, "Session.Group.Participants", convert: p => p != null ? p.Count * 40 : 100 )
                             .FillHorizontal()
-                            .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.SecondaryTextColor))
-                        )),
+                            .ItemTemplate(new DataTemplate(() => new Label()
+                                .Bind("Name")
+                                .Height(40)
+                                .TextCenterVertical()
+                                .Padding(20,0)
+                                .Start()
+                                .FillHorizontal()
+                                .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.SecondaryTextColor))
+                            )),
 
                     new Label()
                         .Text("Split Type")
@@ -114,6 +120,7 @@ public class TransactionPage : BaseContentPage<TransactionViewModel>
                             SelectionMode = SelectionMode.Single,
                             ItemsSource = Enum.GetValues<SplitType>()[new Range(0,2)],
                         }
+                        .Height(80)
                         .Bind(SelectableItemsView.SelectedItemProperty, "Transaction.Type")
                         .Bind<CollectionView, string, bool>(IsVisibleProperty, "Transaction.Category", convert: type => type != Income && type != Transfer)
                         .FillHorizontal()
@@ -124,8 +131,9 @@ public class TransactionPage : BaseContentPage<TransactionViewModel>
                                 SplitType.IncomeProportional => "Income Proportional",
                                 _ => string.Empty
                             })
-                            .Margin(16,0)
-                            .Padding(0)
+                            .Height(40)
+                            .TextCenterVertical()
+                            .Padding(16,0)
                             .Start()
                             .FillHorizontal()
                             .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.SecondaryTextColor))
