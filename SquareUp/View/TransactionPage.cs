@@ -29,6 +29,7 @@ public class TransactionPage : BaseContentPage<TransactionViewModel>
 
         Content = new ScrollView
         {
+            MaximumWidthRequest = 400,
             Content = new VerticalStackLayout
             {
                 Children =
@@ -78,13 +79,14 @@ public class TransactionPage : BaseContentPage<TransactionViewModel>
 
                     new CollectionView
                         {
-                            ItemsLayout = new GridItemsLayout(4, ItemsLayoutOrientation.Vertical),
+                            VerticalScrollBarVisibility = ScrollBarVisibility.Never,
+                            ItemsLayout = new GridItemsLayout(4, ItemsLayoutOrientation.Vertical) { VerticalItemSpacing = 0 },
                             SelectionMode = SelectionMode.Single,
                             ItemsSource = TransactionCategories.All,
                         }
                         .Bind(SelectableItemsView.SelectedItemProperty, "Transaction.Category")
-                        .Bind<CollectionView, IReadOnlyCollection<string>, double>(CollectionView.HeightRequestProperty, source: TransactionCategories.All, convert: s => s != null ? (Math.Ceiling(s.Count/4.0) * CategoryGridItem.ItemHeight) : 100 )
-                        .Margin(16,0)
+                        .Bind<CollectionView, IReadOnlyCollection<string>, double>(HeightRequestProperty, source: TransactionCategories.All, convert: s => s != null ? (Math.Ceiling(s.Count/4.0) * CategoryGridItem.ItemHeight) + 16 : 100 )
+                        .Margins(16,16,16)
                         .FillHorizontal()
                         .ItemTemplate(new CategoryGridItemTemplate()),
 
@@ -168,4 +170,5 @@ public class TransactionPage : BaseContentPage<TransactionViewModel>
             }.BindingContext(BindingContext)
         };
     }
+
 }

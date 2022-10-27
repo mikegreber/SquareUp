@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using SquareUp.Shared.Models;
 using SquareUp.Shared.Types;
 
@@ -76,6 +77,12 @@ public partial class ObservableGroup : ObservableGroupBase,
     [ObservableProperty]
     private FullyObservableCollection<ObservableParticipant> _participants = new();
 
+    [ObservableProperty]
+    private FullyObservableCollection<Debt> _debts = new();
+
+    [ObservableProperty]
+    private FullyObservableCollection<Settlement> _settlements = new();
+
     public ObservableGroup() { }
 
     public ObservableGroup(ObservableGroup group) : base(group)
@@ -100,6 +107,7 @@ public partial class ObservableGroup : ObservableGroupBase,
         Transactions = obj.Transactions;
         Participants = obj.Participants;
         Users = obj.Users;
+        CalculateDebts();
     }
 
     public void Add(ObservableTransaction transaction)
@@ -107,6 +115,7 @@ public partial class ObservableGroup : ObservableGroupBase,
         transaction.Participant = Participants.FirstOrDefault(p => p.Id == transaction.ParticipantId, new ObservableParticipant());
         transaction.SecondaryParticipant = Participants.FirstOrDefault(p => p.Id == transaction.SecondaryParticipantId, new ObservableParticipant());
         Transactions.Add(transaction);
+        CalculateDebts();
     }
 
     public void Add(ObservableUserBase user)
@@ -122,16 +131,97 @@ public partial class ObservableGroup : ObservableGroupBase,
     public void Update(ObservableTransaction transaction)
     {
         Transactions.Update(transaction);
+        CalculateDebts();
     }
 
     public void Remove(ObservableTransaction transaction)
     {
         Transactions.Delete(transaction);
+        CalculateDebts();
     }
 
     public void Remove(ObservableParticipant participant)
     {
         Participants.Remove(participant);
+    }
+
+    protected override void OnPropertyChanged(PropertyChangedEventArgs e)
+    {
+        base.OnPropertyChanged(e);
+        if (e.PropertyName == nameof(Transactions))
+        {
+            CalculateDebts();
+            CalculateSettlements();
+        }
+    }
+
+    private void CalculateDebts()
+    {
+        Dictionary<SplitType, decimal> total = new()
+        {
+            [SplitType.EvenlySplit] = 0,
+            [SplitType.IncomeProportional] = 0,
+            [SplitType.Income] = 0,
+            [SplitType.Payment] = 0,
+        };
+
+        foreach (var transaction in Transactions.SelectMany(x => x))
+            total[transaction.Type] += transaction.Amount;
+
+        var debts = Participants.Select(participant => new Debt(participant, this, total)).ToList();
+        debts.Sort((a, b) => a.Amount.CompareTo(b.Amount));
+
+        Debts = new FullyObservableCollection<Debt>(debts);
+
+        CalculateSettlements();
+        //OnPropertyChanged(new PropertyChangedEventArgs(nameof(Debts)));
+    }
+
+    private void CalculateSettlements()
+    {
+        var owing = Debts
+            .Where(d => d.Amount > 0)
+            .Select(d => new DebtBase { Participant = d.Participant, Amount = d.Amount })
+            .ToList();
+        owing.Sort((a, b) => b.Amount.CompareTo(a.Amount));
+
+        var owed = Debts
+            .Where(d => d.Amount < 0)
+            .Select(d => new DebtBase { Participant = d.Participant, Amount = -d.Amount })
+            .ToList();
+        owed.Sort((a, b) => b.Amount.CompareTo(a.Amount));
+
+        var settlements = new List<Settlement>();
+        while (owing.Count > 0 && owed.Count > 0)
+        {
+            var settlement = new Settlement { From = owing.First().Participant, To = owed.First().Participant };
+
+            if (owed.First().Amount > owing.First().Amount)
+            {
+                settlement.Amount = owing.First().Amount;
+                owed.First().Amount -= owing.First().Amount;
+                owing.Remove(owing.First());
+            }
+            else if (owed.First().Amount < owing.First().Amount)
+            {
+                settlement.Amount = owed.First().Amount;
+                owing.First().Amount -= owed.First().Amount;
+                owed.Remove(owed.First());
+            }
+            else
+            {
+                settlement.Amount = owing.First().Amount;
+                owed.Remove(owed.First());
+                owing.Remove(owing.First());
+            }
+
+            if (settlement.Amount > 0.1m)
+            {
+                settlements.Add(settlement);
+            }
+        }
+
+        Settlements = new FullyObservableCollection<Settlement>(settlements);
     }
 }
 

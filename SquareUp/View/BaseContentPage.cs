@@ -118,10 +118,15 @@ public abstract partial class BaseContentPage<T> : BaseContentPage where T : Bas
 
     public IRelayCommand AppBarActionCommand { get; set; } = new RelayCommand(()=>{});
 
-#if MACCATALYST || IOS || ANDROID
+#if MACCATALYST || IOS
     private int ActionButtonSize = 96;
+    private int ActionButtonCornerRadius = 48;
+#elif ANDROID
+    private int ActionButtonSize = 96;
+    private int ActionButtonCornerRadius = 32;
 #else
     private int ActionButtonSize = 56;
+    private int ActionButtonCornerRadius = 28;
 #endif
 
 
@@ -132,17 +137,18 @@ public abstract partial class BaseContentPage<T> : BaseContentPage where T : Bas
         {
 
 #if !WINDOWS
+#if !ANDROID
             Shell.SetBackButtonBehavior(this, new BackButtonBehavior()
             {
                 IsVisible = true,
                 TextOverride = BackButton
             });
-
+#endif // !ANDROID
             if (!string.IsNullOrEmpty(AppBarActionButtonIconSource) && AppBarActionCommand != null)
             {
                 ToolbarItems.Add(new ToolbarItem("Action", AppBarActionButtonIconSource, () => AppBarActionCommand.Execute(null)));
             }
-#endif
+#endif // !WINDOWS
 
             base.Content = new AbsoluteLayout
                 {
@@ -150,16 +156,16 @@ public abstract partial class BaseContentPage<T> : BaseContentPage where T : Bas
                         .LayoutBounds(0, 0, 1, 1)
                         .LayoutFlags(AbsoluteLayoutFlags.All)
                         .BindingContext(BindingContext),
+
                     new ImageButton
                         {
                             BackgroundColor = Colors.DeepPink,
-                            CornerRadius = ActionButtonSize>>1,
-                            Shadow = new Shadow
-                                { Offset = new Point(0, 10), Brush = new SolidColorBrush(Color.FromRgba(0, 0, 0, 50)) }
+                            CornerRadius = ActionButtonCornerRadius,
+                            Shadow = new Shadow { Offset = new Point(0, 10), Brush = new SolidColorBrush(Color.FromRgba(0, 0, 0, 50)) }
                         }
                         .Source("add.png")
                         .Size(ActionButtonSize)
-                        .Padding(ActionButtonSize/3.5)
+                        .Padding(16)
                         .Margin(16)
                         .CenterVertical()
                         .CenterHorizontal()
@@ -168,10 +174,12 @@ public abstract partial class BaseContentPage<T> : BaseContentPage where T : Bas
                         .BindingContext(BindingContext)
                         .LayoutFlags(AbsoluteLayoutFlags.PositionProportional)
                         .LayoutBounds(1, 1),
+
                     new Loader()
                         .Bind(IsVisibleProperty, "Session.IsLoading")
                         .BindingContext(BindingContext)
-                        .LayoutBounds(0.5,0.5).LayoutFlags(AbsoluteLayoutFlags.PositionProportional)
+                        .LayoutBounds(0.5,0.5)
+                        .LayoutFlags(AbsoluteLayoutFlags.PositionProportional)
                 }
                 .FillHorizontal()
                 .FillVertical()
@@ -183,7 +191,10 @@ public abstract partial class BaseContentPage<T> : BaseContentPage where T : Bas
 
 public abstract class BaseContentView<T> : ContentView where T : BaseViewModel
 {
-    protected BaseContentView(in T viewModel) { }
+    protected BaseContentView(in T viewModel)
+    {
+        base.BindingContext = viewModel;
+    }
     protected new T BindingContext => (T) base.BindingContext;
 }
 

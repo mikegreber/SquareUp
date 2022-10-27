@@ -54,7 +54,7 @@ public partial class GroupDetailsViewModel : BaseViewModel, IQueryAttributable
     {
         // TODO use new view instead of prompt
         var prompt = await Page.DisplayPromptAsync("Add participant", "Enter name for new participant.");
-        if (prompt == "Cancel") return;
+        if (string.IsNullOrEmpty(prompt)) return;
 
         var response = await Session.AddParticipant(new() { GroupId = Group.Id, Name = prompt });
         await Page.DisplayAlert("Response", response.Message, "Ok");
@@ -65,7 +65,7 @@ public partial class GroupDetailsViewModel : BaseViewModel, IQueryAttributable
     {
         // TODO use new view instead of prompt
         var email = await Page.DisplayPromptAsync("Invite user", "Enter email address");
-        if (email == null) return;
+        if (string.IsNullOrEmpty(email)) return;
 
         var response = await Session.InviteParticipant(new() {ParticipantId = participant.Id, GroupId = Group.Id, UserEmail = email });
         await Page.DisplayAlert("Response", response.Message, "Ok");

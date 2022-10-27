@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Headers;
+﻿using System.ComponentModel;
+using System.Net.Http.Headers;
 using CommunityToolkit.Mvvm.ComponentModel;
 using SquareUp.Model;
 using SquareUp.Services.Groups;
@@ -26,6 +27,12 @@ public partial class SessionData : ObservableObject, ISessionData
 
     [ObservableProperty]
     private ObservableGroup? _group;
+
+    [ObservableProperty]
+    private FullyObservableCollection<Debt> _debts = new();
+
+    [ObservableProperty]
+    private FullyObservableCollection<Settlement> _settlements = new();
 
     [ObservableProperty]
     private bool _isLoading;
@@ -158,7 +165,6 @@ public partial class SessionData : ObservableObject, ISessionData
         }
 
         Group?.Update(response.Data);
-        UpdateLastEditTime();
         IsLoading = false;
         return response;
     }
@@ -173,8 +179,7 @@ public partial class SessionData : ObservableObject, ISessionData
             return response;
         }
 
-        Group.Transactions.Delete(transaction);
-        UpdateLastEditTime();
+        Group.Remove(transaction);
         IsLoading = false;
         return response;
     }

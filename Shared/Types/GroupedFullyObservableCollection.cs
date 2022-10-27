@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using SquareUp.Shared.Models;
 
@@ -60,7 +61,7 @@ public class GroupedFullyObservableCollection<TKey, TItem> :
         foreach (var group in Items)
             if (CompareGroups(group.Key, item) == 0)
             {
-                if (group.Count != 0) 
+                if (group.Count > 1) 
                     return group.Delete(item);
                 
                 Remove(group);

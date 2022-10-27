@@ -31,6 +31,7 @@ public class GroupDetailsPage : BaseContentPage<GroupDetailsViewModel>
 
         Content = new ScrollView
         {
+            MaximumWidthRequest = 400,
             Content = new VerticalStackLayout
             {
                 Children =

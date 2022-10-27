@@ -1,4 +1,5 @@
-﻿using SquareUp.Model;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using SquareUp.Model;
 using SquareUp.Shared.Models;
 using SquareUp.Shared.Requests;
 using SquareUp.Shared.Types;
@@ -11,6 +12,8 @@ public interface ISessionData
     public ObservableUserBase User { get; set; }
     public GroupInfoList Groups { get; set; }
     public ObservableGroup Group { get; set; }
+    public FullyObservableCollection<Debt> Debts { get; set; }
+    public FullyObservableCollection<Settlement> Settlements { get; set; }
     public bool IsLoading { get; set; }
 
     Task<ServiceResponse<ObservableUserBase>> Login(LoginRequest request);
