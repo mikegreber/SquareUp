@@ -11,35 +11,49 @@ public class GroupsPage : BaseContentPage<GroupsViewModel>
     {
         Title = "Groups";
         BackButton = "< Sign Out";
+        Padding = 0;
 
         Content = new ScrollView
         {
-            MaximumWidthRequest = 400,
-            Content = new VerticalStackLayout
+            Content = new StackLayout()
             {
-                new CollectionView
+                Children =
+                {
+                    new StackLayout
                     {
-                        Margin = 0,
-                        IsGrouped = true,
-                        ItemSizingStrategy = ItemSizingStrategy.MeasureAllItems,
-                        ItemsLayout = new LinearItemsLayout(ItemsLayoutOrientation.Vertical) { ItemSpacing = 5 },
-                        GroupHeaderTemplate = new DataTemplate(() => new Label
-                            {
-                                HeightRequest = 30,
-                                HorizontalOptions = LayoutOptions.Fill,
-                                HorizontalTextAlignment = TextAlignment.Start,
-                                VerticalTextAlignment = TextAlignment.End
-                            }
-                            .Margin(0)
-                            .Font(bold: true)
-                            .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.PrimaryTextColor))
-                            .Bind<Label, DateTime, string>(Label.TextProperty, "Key",
-                                convert: d => d.ToLongDateString().ToUpper()))
-                    }
-                    .Margin(new Thickness(0, 0, 0, 72))
-                    .Bind(ItemsView.ItemsSourceProperty, "Session.Groups")
-                    .ItemTemplate(new GroupCardTemplate(BindingContext.GroupTapCommand))
-            }.Padding(12)
+                        MaximumWidthRequest = 400,
+                        Children =
+                        {
+                            new CollectionView
+                                {
+                                    IsGrouped = true,
+                                    ItemSizingStrategy = ItemSizingStrategy.MeasureAllItems,
+                                    ItemsLayout = new LinearItemsLayout(ItemsLayoutOrientation.Vertical) { ItemSpacing = 5 },
+                                    GroupHeaderTemplate = new DataTemplate(() => new Label
+                                        {
+                                            HeightRequest = 30,
+                                            HorizontalOptions = LayoutOptions.Fill,
+                                            HorizontalTextAlignment = TextAlignment.Start,
+                                            VerticalTextAlignment = TextAlignment.End
+                                        }
+                                        .Margin(12, 0)
+                                        .Font(bold: true)
+                                        .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.PrimaryTextColor))
+                                        .Bind<Label, DateTime, string>(Label.TextProperty, "Key",
+                                            convert: d =>
+                                            {
+                                                var s = d.ToLongDateString().Split(' ');
+                                                return (s[1] + " " + s[3]).ToUpper();
+                                            }))
+                                }
+                                .FillHorizontal()
+                                .Margins(bottom: 72)
+                                .Bind(ItemsView.ItemsSourceProperty, "Session.Groups")
+                                .ItemTemplate(new GroupCardTemplate(BindingContext.GroupTapCommand))
+                        }
+                    }.Padding(12, 0)
+                }
+            },
         };
     }
 

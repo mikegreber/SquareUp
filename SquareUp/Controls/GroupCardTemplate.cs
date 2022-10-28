@@ -65,6 +65,7 @@ public partial class GroupCard : ContentView
     {
         Content = new Border()
         {
+            Margin = 0,
             BackgroundColor = Colors.Transparent,
             StrokeShape = new RoundRectangle { CornerRadius = 10 },
             
@@ -140,58 +141,6 @@ public partial class GroupCard : ContentView
                 .BindTapGesture(nameof(Command), parameterPath: nameof(Group))
                 .Bind<Grid, string, LinearGradientBrush>(BackgroundProperty, "Group.Color", convert: Converters.ConvertBackground)
                 .BindingContext(this),
-
-            //     Content = new VerticalStackLayout
-            //     {
-            //         Children =
-            //                 {
-            //                     new FlexLayout {
-            //                             AlignContent = FlexAlignContent.SpaceBetween,
-            //                             AlignItems = FlexAlignItems.Center,
-            //                             Direction = FlexDirection.Row,
-            //                             Children =
-            //                             {
-            //                                 new Label()
-            //                                     .Font(bold: true, size: 24)
-            //                                     .Padding(0)
-            //                                     .Bind(Label.TextProperty, "Group.Name")
-            //                                     .Grow(1)
-            //                                     .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.PrimaryTextColor)),
-            //
-            //                                 new Image()
-            //                                     .Margins(top:1)
-            //                                     .Source("person.png")
-            //                                     .Size(15)
-            //                                     .CenterVertical(),
-            //
-            //                                 new Label()
-            //                                     .Font(bold: true, size: 16)
-            //                                     .Bind(Label.TextProperty, "Group.Participants")
-            //                                     .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.PrimaryTextColor)),
-            //                             }
-            //                         }
-            //                         .Height(30)
-            //                         .FillHorizontal(),
-            //
-            //                     new Label()
-            //                         .Text("Last edited:")
-            //                         .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.SecondaryTextColor)),
-            //
-            //                     new Label()
-            //                         .Padding(0)
-            //                         .Font(bold: false, size: 16)
-            //                         .Bind<Label, DateTime, string>(Label.TextProperty, "Group.LastEdit", convert: d => $"{d.ToLongDateString()}")
-            //                         .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.SecondaryTextColor)),
-            //
-            //                     new Label()
-            //                         .Padding(0)
-            //                         .Font(bold: false, size: 14)
-            //                         .Bind<Label, DateTime, string>(Label.TextProperty, "Group.LastEdit", convert: d => $"{d.ToShortTimeString()}")
-            //                         .DynamicResource(Label.TextColorProperty, nameof(ThemeBase.SecondaryTextColor)),
-            //                 }
-            //     }
-            // }
-
         };
     }
 }

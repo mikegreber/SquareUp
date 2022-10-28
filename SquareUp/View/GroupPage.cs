@@ -142,12 +142,13 @@ public class GroupPage : BaseContentPage<GroupViewModel>
 
         Content = new ScrollView
         {
-            MaximumWidthRequest = 400,
-            Content = new VerticalStackLayout
+            Content = new StackLayout()
             {
-                Spacing = 0,
-                Padding = 12,
-                BindingContext = BindingContext,
+                Children =
+                {
+new StackLayout
+            {
+                MaximumWidthRequest = 400,
                 Children =
                 {
                     new Border
@@ -215,7 +216,12 @@ public class GroupPage : BaseContentPage<GroupViewModel>
                         .Bind(ItemsView.ItemsSourceProperty, "Session.Group.Transactions")
                         .ItemTemplate(new TransactionCardTemplate(BindingContext.TapTransactionCommand))
                 }
+            }.Padding(12).BindingContext(BindingContext)
+                }
             }
+
+
+            
         };
     }
 #endif
