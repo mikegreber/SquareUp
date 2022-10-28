@@ -5,4 +5,4 @@
 
 - Full stack native cross-platform .NET MAUI (evolution of Xamarin.Forms) application.
 
-- Uses a Web API backend with authentication utilizing Entity Framework Core with an SQL database.
+- ASP.NET Core Web API backend with authentication utilizing Entity Framework Core with an SQL database.
