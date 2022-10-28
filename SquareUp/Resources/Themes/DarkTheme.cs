@@ -15,7 +15,8 @@ public class DarkTheme : ThemeBase
 
     public override Style EntryStyle { get; } = new Style<Entry>(
         (Entry.TextColorProperty, Gray50),
-        (Entry.PlaceholderColorProperty, Gray600)
+        (Entry.PlaceholderColorProperty, Gray600),
+        (Entry.BackgroundColorProperty, Black)
     ).ApplyToDerivedTypes(true);
 
     public override Style ButtonCreateStyle { get; } = new Style<Button>(
