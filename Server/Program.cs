@@ -12,13 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<DataContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString(
-#if RELEASE
-"LiveConnection"
-#else
-        "DefaultConnection"
-#endif
-    ));
+    options.UseSqlite("Data Source=app.db");
 });
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme);
@@ -62,5 +56,9 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+var scope = app.Services.CreateScope();
+scope.ServiceProvider.GetRequiredService<DataContext>().Database.EnsureCreated();
+scope.Dispose();
 
 app.Run();

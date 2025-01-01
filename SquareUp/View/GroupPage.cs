@@ -34,7 +34,7 @@ public class GroupPage : BaseContentPage<GroupViewModel>
 #if WINDOWS || MACCATALYST
     public GroupPage(GroupViewModel viewModel, DebtsViewModel debtsViewModel) : base(viewModel)
     {
-        BackButton = "< Groups";
+        BackButton = "Groups";
         AppBarActionButtonIconSource = "settings_white.png";
         AppBarActionCommand = BindingContext.TapSettingsCommand;
 
@@ -136,7 +136,7 @@ public class GroupPage : BaseContentPage<GroupViewModel>
 #else
     public GroupPage(GroupViewModel viewModel) : base(viewModel)
     {
-        BackButton = "< Groups";
+        BackButton = "Groups";
         AppBarActionButtonIconSource = "settings_white.png";
         AppBarActionCommand = BindingContext.TapSettingsCommand;
 

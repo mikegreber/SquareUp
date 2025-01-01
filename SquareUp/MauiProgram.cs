@@ -29,21 +29,18 @@ public static class MauiProgram
             .RegisterViewModels()
             .RegisterViews();
 
-
         return builder.Build();
 	}
 
     public static MauiAppBuilder RegisterAppServices(this MauiAppBuilder mauiAppBuilder)
     {
         mauiAppBuilder.Services.AddSingleton(DeviceInfo.Current);
-
-#if RELEASE
-        mauiAppBuilder.Services.AddSingleton(_ => new HttpClient { BaseAddress = new Uri("https://squareupserver20221005155638.azurewebsites.net") });
-#elif WINDOWS
-        mauiAppBuilder.Services.AddSingleton(_ => new HttpClient { BaseAddress = new Uri("https://localhost:5001/") });
-#else
-        mauiAppBuilder.Services.AddSingleton(_ => new HttpClient { BaseAddress = new Uri("http://192.168.1.76:5000/") });
-#endif
+		#if ANDROID
+        mauiAppBuilder.Services.AddSingleton(_ => new HttpClient { BaseAddress = new Uri("http://10.0.2.2:5000/") });
+		#else
+        mauiAppBuilder.Services.AddSingleton(_ => new HttpClient { BaseAddress = new Uri("http://localhost:5000/") });
+        #endif
+	    
         mauiAppBuilder.Services.AddSingleton<IUserService, UserService>();
         mauiAppBuilder.Services.AddSingleton<IAuthService, AuthService>();
         mauiAppBuilder.Services.AddSingleton<IGroupService, GroupService>();

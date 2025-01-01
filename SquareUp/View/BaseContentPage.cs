@@ -116,7 +116,7 @@ public abstract partial class BaseContentPage<T> : BaseContentPage where T : Bas
 
     protected string AppBarActionButtonIconSource { get; set; } = string.Empty;
 
-    public IRelayCommand AppBarActionCommand { get; set; } = new RelayCommand(()=>{});
+    public IRelayCommand? AppBarActionCommand { get; set; } = new RelayCommand(()=>{});
 
 #if MACCATALYST || IOS
     private int ActionButtonSize = 96;

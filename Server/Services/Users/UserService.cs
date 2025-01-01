@@ -67,7 +67,7 @@ public class UserService : IUserService
     {
         loginRequest.Email = loginRequest.Email.ToLower();
         var user = await _context.Users
-            .Where(u => u.Email == loginRequest.Email)
+            .Where(u => u.Email.ToLower() == loginRequest.Email)
             .FirstOrDefaultAsync();
 
         if (user == null || !VerifyPasswordHash(loginRequest.Password, user.PasswordHash, user.PasswordSalt))

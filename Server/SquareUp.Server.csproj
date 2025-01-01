@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>aspnet-Server-AB16B693-D18D-48A6-BDA3-D5480451FE5A</UserSecretsId>
@@ -17,22 +17,23 @@
 
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'Server' " />
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.9" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="6.0.9" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.9" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.9">
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="9.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.9" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.5">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Identity.Web" Version="1.25.3" />
-    <PackageReference Include="Microsoft.Identity.Web.MicrosoftGraph" Version="1.25.3" />
-    <PackageReference Include="Microsoft.Identity.Web.UI" Version="1.25.3" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    <PackageReference Include="Microsoft.Identity.Web" Version="3.5.0" />
+    <PackageReference Include="Microsoft.Identity.Web.MicrosoftGraph" Version="3.5.0" />
+    <PackageReference Include="Microsoft.Identity.Web.UI" Version="3.5.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
   </ItemGroup>
 
   <ItemGroup>

@@ -21,7 +21,7 @@ public abstract partial class BaseViewModel
         await Shell.Current.GoToAsync("..", AnimateBackTransitions);
     }
 
-    public virtual Func<Task> OnActionButtonClicked { get; set; } = null;
+    public virtual Func<Task>? OnActionButtonClicked { get; set; } = null;
 
     [RelayCommand]
     private async Task Back()
@@ -34,10 +34,10 @@ public abstract partial class BaseViewModel
     {
         if (OnActionButtonClicked != null) await OnActionButtonClicked();
     }
-
     
-
     protected Page Page => Application.Current!.MainPage!;
+    
+    
 }
 
 public enum PageMode { Create, Edit }

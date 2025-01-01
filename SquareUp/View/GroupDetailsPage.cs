@@ -25,7 +25,7 @@ public class GroupDetailsPage : BaseContentPage<GroupDetailsViewModel>
 
     public GroupDetailsPage(GroupDetailsViewModel viewModel) : base(viewModel)
     {
-        BackButton = "< Groups";
+        BackButton = "Groups";
 
         this.Bind(TitleProperty, nameof(BindingContext.Title));
 

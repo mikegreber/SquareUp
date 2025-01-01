@@ -5,19 +5,17 @@ namespace SquareUp;
 
 public class App : Application
 {
-
-    enum Row { First }
-
-    enum Column { Back, Title, Action }
-
+    private readonly LoginPage _loginPage;
+    
     public App(LoginPage loginPage)
     {
+        _loginPage = loginPage;
         SetAppTheme(RequestedTheme);
 
         RequestedThemeChanged += HandleRequestedThemeChanged;
-
-        MainPage = new AppShell { Items = { loginPage } };
     }
+    
+    protected override Window CreateWindow(IActivationState? activationState) => new(new AppShell(_loginPage));
 
     private void HandleRequestedThemeChanged(object sender, AppThemeChangedEventArgs e) =>
         SetAppTheme(e.RequestedTheme);

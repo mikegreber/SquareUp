@@ -10,7 +10,7 @@ public class GroupsPage : BaseContentPage<GroupsViewModel>
     public GroupsPage(GroupsViewModel viewModel) : base(in viewModel)
     {
         Title = "Groups";
-        BackButton = "< Sign Out";
+        BackButton = "Sign Out";
         Padding = 0;
 
         Content = new ScrollView
@@ -62,7 +62,6 @@ public class GroupsPage : BaseContentPage<GroupsViewModel>
         await Shell.Current.GoToAsync(
             nameof(GroupsPage),
             true
-            // no parameters
         );
     }
 }
